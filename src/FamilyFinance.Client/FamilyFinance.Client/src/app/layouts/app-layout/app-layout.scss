@@ -1,0 +1,31 @@
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+.app-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-layout__body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  width: min(1440px, 100%);
+  margin: 0 auto;
+}
+
+.app-layout__content {
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+}
+
+@media (max-width: 760px) {
+  .app-layout__body {
+    flex-direction: column;
+  }
+}
+

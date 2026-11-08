@@ -1,0 +1,82 @@
+:host {
+  display: block;
+}
+
+.page-header {
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 max(28px, calc((100vw - 1440px) / 2 + 28px)) 0 max(16px, calc((100vw - 1440px) / 2));
+  color: var(--f1-surface, #ffffff);
+  background: var(--f1-navy, #1b4167);
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: inherit;
+    font-size: 1.125rem;
+    font-weight: 700;
+    text-decoration: none;
+
+    .brand-mark {
+      display: grid;
+      width: 29px;
+      height: 32px;
+      place-items: center;
+      border-radius: 2px;
+      color: #0d927d;
+      background: var(--f1-surface, #ffffff);
+
+      svg {
+        width: 19px;
+        height: 19px;
+      }
+    }
+  }
+
+  .header-spacer {
+    flex: 1;
+  }
+
+  .account-menu {
+    position: relative;
+
+    .account-trigger {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px;
+      border: 0;
+      color: inherit;
+      background: transparent;
+      font: inherit;
+      cursor: pointer;
+
+      .user-name {
+        color: var(--f1-surface, #ffffff);
+        font-size: var(--f1-small, 0.875rem);
+        font-weight: 600;
+      }
+
+      .avatar {
+        display: grid;
+        width: 32px;
+        height: 32px;
+        place-items: center;
+        border-radius: 50%;
+        color: var(--f1-surface, #ffffff);
+        background: #f05d63;
+        font-size: 0.75rem;
+        font-weight: 700;
+      }
+
+      .account-chevron {
+        width: 16px;
+        height: 16px;
+      }
+    }
+  }
+}
+

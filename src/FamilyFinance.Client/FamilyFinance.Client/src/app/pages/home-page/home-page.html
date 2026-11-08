@@ -1,330 +1,268 @@
-<main class="dashboard-page">
-  <!-- Header / Navbar -->
-  <header class="page-header">
-    <a routerLink="/monthly-planning" aria-label="Family Finance home" class="brand">
-      <span aria-hidden="true" class="brand-mark">
-        <svg viewBox="0 0 24 24" fill="none">
-          <path d="M4 5.5h16v13H4zM8 3v5m8-5v5M4 10h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-          <path d="m8 14 2.3 2.3L16 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+<div class="page-main">
+  <!-- Welcome Section & Month Selector -->
+  <section aria-labelledby="dashboard-title" class="welcome">
+    <div>
+      <p class="eyebrow">Saturday, September 26, 2026</p>
+      <h1 id="dashboard-title">Good morning, Family Name</h1>
+      <p class="welcome-copy">Here is your family finance snapshot for this month.</p>
+      
+      <label for="dashboard-month" class="dashboard-month-label">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <rect x="3.5" y="5" width="17" height="15.5" rx="2" stroke="currentColor" stroke-width="1.8"></rect>
+          <path d="M7.5 3v4M16.5 3v4M4 9.5h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
         </svg>
-      </span>
-      <span>Family Finance</span>
-    </a>
-
-    <span class="header-spacer"></span>
-
-    <div class="account-menu">
-      <button type="button" aria-haspopup="menu" class="account-trigger" aria-expanded="false">
-        <span class="user-name">Family Name</span>
-        <span aria-hidden="true" class="avatar">FN</span>
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" class="account-chevron">
-          <path d="m7 9 5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-        </svg>
-      </button>
+        <select id="dashboard-month">
+          <option value="1">January 2026</option>
+          <option value="2">February 2026</option>
+          <option value="3">March 2026</option>
+          <option value="4" selected>April 2026</option>
+          <option value="5">May 2026</option>
+          <option value="6">June 2026</option>
+          <option value="7">July 2026</option>
+          <option value="8">August 2026</option>
+          <option value="9">September 2026</option>
+          <option value="10">October 2026</option>
+          <option value="11">November 2026</option>
+          <option value="12">December 2026</option>
+        </select>
+      </label>
     </div>
-  </header>
 
-  <!-- Body Container: Sidebar + Page Main -->
-  <div class="shell">
-    <!-- Sidebar Navigation -->
-    <aside aria-label="Primary navigation" class="sidebar">
-      <a routerLink="/dashboard" class="nav-item active">
-        <span aria-hidden="true" class="nav-icon">
-          <svg viewBox="0 0 24 24" fill="none">
-            <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-6v-7h-4v7H4a1 1 0 0 1-1-1V10Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path>
-          </svg>
-        </span>
-        <span>Home</span>
-      </a>
+    <a routerLink="/monthly-planning" class="primary-link">Plan this month</a>
+  </section>
 
-      <a routerLink="/monthly-planning" class="nav-item">
-        <span aria-hidden="true" class="nav-icon">
-          <svg viewBox="0 0 24 24" fill="none">
-            <rect x="3.5" y="5" width="17" height="15.5" rx="2" stroke="currentColor" stroke-width="1.8"></rect>
-            <path d="M7.5 3v4M16.5 3v4M4 9.5h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
-          </svg>
-        </span>
-        <span>Planning</span>
-      </a>
+  <!-- 3 Summary Metrics Cards -->
+  <section aria-label="Financial summary" class="summary-grid">
+    <article class="summary-card summary-card-balance">
+      <div aria-hidden="true" class="card-icon">$</div>
+      <div>
+        <p class="card-label">Available balance</p>
+        <p class="card-value">133 <span>VND</span></p>
+        <p class="card-meta positive">April 2026</p>
+      </div>
+    </article>
 
-      <a routerLink="/expenses/new" class="nav-item">
-        <span aria-hidden="true" class="nav-icon">
-          <svg viewBox="0 0 24 24" fill="none">
-            <path d="M12 2.8v18.4M17 6.2c-.9-1-2.4-1.6-4.5-1.6-2.4 0-4 1.1-4 2.8 0 4.6 9.5 1.5 9.5 6.7 0 2-1.9 3.5-4.9 3.5-2 0-3.7-.6-5-1.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
-          </svg>
-        </span>
-        <span>Add Expense</span>
-      </a>
-    </aside>
+    <article class="summary-card">
+      <div aria-hidden="true" class="card-icon income-icon">+</div>
+      <div>
+        <p class="card-label">Monthly income</p>
+        <p class="card-value">133 <span>VND</span></p>
+        <p class="card-meta">April 2026</p>
+      </div>
+    </article>
 
-    <!-- Main Content Area -->
-    <div class="page-main">
-      <!-- Welcome Section & Month Selector -->
-      <section aria-labelledby="dashboard-title" class="welcome">
+    <article class="summary-card">
+      <div aria-hidden="true" class="card-icon expense-icon">-</div>
+      <div>
+        <p class="card-label">Spent this month</p>
+        <p class="card-value">0 <span>VND</span></p>
+        <p class="card-meta">0.0% of income</p>
+      </div>
+    </article>
+  </section>
+
+  <!-- Dashboard Grid: Donut Chart + Recent Activity -->
+  <div class="dashboard-grid">
+    <!-- 7 Jar Allocation Donut -->
+    <section aria-labelledby="allocation-title" class="panel allocation-panel">
+      <div class="panel-heading">
         <div>
-          <p class="eyebrow">Saturday, September 26, 2026</p>
-          <h1 id="dashboard-title">Good morning, Family Name</h1>
-          <p class="welcome-copy">Here is your family finance snapshot for this month.</p>
-          
-          <label for="dashboard-month" class="dashboard-month-label">
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <rect x="3.5" y="5" width="17" height="15.5" rx="2" stroke="currentColor" stroke-width="1.8"></rect>
-              <path d="M7.5 3v4M16.5 3v4M4 9.5h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
-            </svg>
-            <select id="dashboard-month">
-              <option value="1">January 2026</option>
-              <option value="2">February 2026</option>
-              <option value="3">March 2026</option>
-              <option value="4" selected>April 2026</option>
-              <option value="5">May 2026</option>
-              <option value="6">June 2026</option>
-              <option value="7">July 2026</option>
-              <option value="8">August 2026</option>
-              <option value="9">September 2026</option>
-              <option value="10">October 2026</option>
-              <option value="11">November 2026</option>
-              <option value="12">December 2026</option>
-            </select>
-          </label>
+          <p class="eyebrow">Monthly plan</p>
+          <h2 id="allocation-title">Seven jar allocation</h2>
         </div>
-
-        <a routerLink="/monthly-planning" class="primary-link">Plan this month</a>
-      </section>
-
-      <!-- 3 Summary Metrics Cards -->
-      <section aria-label="Financial summary" class="summary-grid">
-        <article class="summary-card summary-card-balance">
-          <div aria-hidden="true" class="card-icon">$</div>
-          <div>
-            <p class="card-label">Available balance</p>
-            <p class="card-value">133 <span>VND</span></p>
-            <p class="card-meta positive">April 2026</p>
-          </div>
-        </article>
-
-        <article class="summary-card">
-          <div aria-hidden="true" class="card-icon income-icon">+</div>
-          <div>
-            <p class="card-label">Monthly income</p>
-            <p class="card-value">133 <span>VND</span></p>
-            <p class="card-meta">April 2026</p>
-          </div>
-        </article>
-
-        <article class="summary-card">
-          <div aria-hidden="true" class="card-icon expense-icon">-</div>
-          <div>
-            <p class="card-label">Spent this month</p>
-            <p class="card-value">0 <span>VND</span></p>
-            <p class="card-meta">0.0% of income</p>
-          </div>
-        </article>
-      </section>
-
-      <!-- Dashboard Grid: Donut Chart + Recent Activity -->
-      <div class="dashboard-grid">
-        <!-- 7 Jar Allocation Donut -->
-        <section aria-labelledby="allocation-title" class="panel allocation-panel">
-          <div class="panel-heading">
-            <div>
-              <p class="eyebrow">Monthly plan</p>
-              <h2 id="allocation-title">Seven jar allocation</h2>
-            </div>
-            <a routerLink="/monthly-planning">View plan</a>
-          </div>
-
-          <div class="allocation-content">
-            <div aria-label="100 percent allocated" class="donut"
-              style="background:conic-gradient(var(--f1-jar-living) 0% 35%,var(--f1-jar-food) 35% 55%,var(--f1-jar-children) 55% 65%,var(--f1-jar-emergency) 65% 75%,var(--f1-jar-savings) 75% 85%,var(--f1-jar-investment) 85% 95%,var(--f1-jar-travel) 95% 100%)">
-              <div class="donut-label">
-                <strong>100%</strong>
-                <span>allocated</span>
-              </div>
-            </div>
-
-            <div class="legend">
-              <div class="legend-row">
-                <span class="dot living"></span>
-                <span>Living Expenses</span>
-                <strong>35%</strong>
-              </div>
-              <div class="legend-row">
-                <span class="dot food"></span>
-                <span>Food</span>
-                <strong>20%</strong>
-              </div>
-              <div class="legend-row">
-                <span class="dot children"></span>
-                <span>Children</span>
-                <strong>10%</strong>
-              </div>
-              <div class="legend-row">
-                <span class="dot emergency"></span>
-                <span>Emergency Fund</span>
-                <strong>10%</strong>
-              </div>
-              <div class="legend-row">
-                <span class="dot savings"></span>
-                <span>Savings</span>
-                <strong>10%</strong>
-              </div>
-              <div class="legend-row">
-                <span class="dot investment"></span>
-                <span>Investment</span>
-                <strong>10%</strong>
-              </div>
-              <div class="legend-row">
-                <span class="dot travel"></span>
-                <span>Entertainment &amp; Travel</span>
-                <strong>5%</strong>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- Recent Activity -->
-        <section aria-labelledby="activity-title" class="panel activity-panel">
-          <div class="panel-heading">
-            <div>
-              <p class="eyebrow">Latest updates</p>
-              <h2 id="activity-title">Recent activity</h2>
-            </div>
-            <a routerLink="/monthly-planning">See all</a>
-          </div>
-
-          <ul class="activity-list">
-            <li>
-              <span class="activity-marker food">F</span>
-              <span>
-                <strong>Grocery shopping</strong>
-                <small>Food jar</small>
-              </span>
-              <b>-850,000 VND</b>
-            </li>
-            <li>
-              <span class="activity-marker living">L</span>
-              <span>
-                <strong>Monthly rent</strong>
-                <small>Living Expenses jar</small>
-              </span>
-              <b>-6,000,000 VND</b>
-            </li>
-            <li>
-              <span class="activity-marker savings">S</span>
-              <span>
-                <strong>Emergency fund</strong>
-                <small>Savings jar</small>
-              </span>
-              <b>-1,500,000 VND</b>
-            </li>
-          </ul>
-        </section>
+        <a routerLink="/monthly-planning">View plan</a>
       </div>
 
-      <!-- Updated Spending Statistics (7 Jars List) -->
-      <section aria-labelledby="refreshed-statistics-title" class="panel refreshed-statistics">
-        <div class="panel-heading">
-          <div>
-            <p class="eyebrow">New expense data</p>
-            <h2 id="refreshed-statistics-title">Updated spending statistics</h2>
-          </div>
-          <span class="statistics-period">April 2026</span>
-        </div>
-
-        <div class="refreshed-summary">
-          <div>
-            <span>Available after expenses</span>
-            <strong>133 VND</strong>
-          </div>
-          <div>
-            <span>Spent this month</span>
-            <strong>0 VND</strong>
-          </div>
-          <div>
-            <span>Share of income</span>
-            <strong>0.0% of income</strong>
+      <div class="allocation-content">
+        <div aria-label="100 percent allocated" class="donut"
+          style="background:conic-gradient(var(--f1-jar-living) 0% 35%,var(--f1-jar-food) 35% 55%,var(--f1-jar-children) 55% 65%,var(--f1-jar-emergency) 65% 75%,var(--f1-jar-savings) 75% 85%,var(--f1-jar-investment) 85% 95%,var(--f1-jar-travel) 95% 100%)">
+          <div class="donut-label">
+            <strong>100%</strong>
+            <span>allocated</span>
           </div>
         </div>
 
-        <div class="refreshed-jar-list">
-          <div class="refreshed-jar-row">
-            <div class="refreshed-jar-heading">
-              <strong>Living Expenses</strong>
-              <span>0%</span>
-            </div>
-            <div role="progressbar" aria-valuemin="0" aria-valuemax="100" class="refreshed-progress" aria-valuenow="0">
-              <span style="width:0%"></span>
-            </div>
-            <small>0 / 47 VND</small>
+        <div class="legend">
+          <div class="legend-row">
+            <span class="dot living"></span>
+            <span>Living Expenses</span>
+            <strong>35%</strong>
           </div>
-
-          <div class="refreshed-jar-row">
-            <div class="refreshed-jar-heading">
-              <strong>Food</strong>
-              <span>0%</span>
-            </div>
-            <div role="progressbar" aria-valuemin="0" aria-valuemax="100" class="refreshed-progress" aria-valuenow="0">
-              <span style="width:0%"></span>
-            </div>
-            <small>0 / 27 VND</small>
+          <div class="legend-row">
+            <span class="dot food"></span>
+            <span>Food</span>
+            <strong>20%</strong>
           </div>
-
-          <div class="refreshed-jar-row">
-            <div class="refreshed-jar-heading">
-              <strong>Children</strong>
-              <span>0%</span>
-            </div>
-            <div role="progressbar" aria-valuemin="0" aria-valuemax="100" class="refreshed-progress" aria-valuenow="0">
-              <span style="width:0%"></span>
-            </div>
-            <small>0 / 13 VND</small>
+          <div class="legend-row">
+            <span class="dot children"></span>
+            <span>Children</span>
+            <strong>10%</strong>
           </div>
-
-          <div class="refreshed-jar-row">
-            <div class="refreshed-jar-heading">
-              <strong>Emergency Fund</strong>
-              <span>0%</span>
-            </div>
-            <div role="progressbar" aria-valuemin="0" aria-valuemax="100" class="refreshed-progress" aria-valuenow="0">
-              <span style="width:0%"></span>
-            </div>
-            <small>0 / 13 VND</small>
+          <div class="legend-row">
+            <span class="dot emergency"></span>
+            <span>Emergency Fund</span>
+            <strong>10%</strong>
           </div>
-
-          <div class="refreshed-jar-row">
-            <div class="refreshed-jar-heading">
-              <strong>Savings</strong>
-              <span>0%</span>
-            </div>
-            <div role="progressbar" aria-valuemin="0" aria-valuemax="100" class="refreshed-progress" aria-valuenow="0">
-              <span style="width:0%"></span>
-            </div>
-            <small>0 / 13 VND</small>
+          <div class="legend-row">
+            <span class="dot savings"></span>
+            <span>Savings</span>
+            <strong>10%</strong>
           </div>
-
-          <div class="refreshed-jar-row">
-            <div class="refreshed-jar-heading">
-              <strong>Investment</strong>
-              <span>0%</span>
-            </div>
-            <div role="progressbar" aria-valuemin="0" aria-valuemax="100" class="refreshed-progress" aria-valuenow="0">
-              <span style="width:0%"></span>
-            </div>
-            <small>0 / 13 VND</small>
+          <div class="legend-row">
+            <span class="dot investment"></span>
+            <span>Investment</span>
+            <strong>10%</strong>
           </div>
-
-          <div class="refreshed-jar-row">
-            <div class="refreshed-jar-heading">
-              <strong>Entertainment &amp; Travel</strong>
-              <span>0%</span>
-            </div>
-            <div role="progressbar" aria-valuemin="0" aria-valuemax="100" class="refreshed-progress" aria-valuenow="0">
-              <span style="width:0%"></span>
-            </div>
-            <small>0 / 7 VND</small>
+          <div class="legend-row">
+            <span class="dot travel"></span>
+            <span>Entertainment &amp; Travel</span>
+            <strong>5%</strong>
           </div>
         </div>
-      </section>
-    </div>
+      </div>
+    </section>
+
+    <!-- Recent Activity -->
+    <section aria-labelledby="activity-title" class="panel activity-panel">
+      <div class="panel-heading">
+        <div>
+          <p class="eyebrow">Latest updates</p>
+          <h2 id="activity-title">Recent activity</h2>
+        </div>
+        <a routerLink="/monthly-planning">See all</a>
+      </div>
+
+      <ul class="activity-list">
+        <li>
+          <span class="activity-marker food">F</span>
+          <span>
+            <strong>Grocery shopping</strong>
+            <small>Food jar</small>
+          </span>
+          <b>-850,000 VND</b>
+        </li>
+        <li>
+          <span class="activity-marker living">L</span>
+          <span>
+            <strong>Monthly rent</strong>
+            <small>Living Expenses jar</small>
+          </span>
+          <b>-6,000,000 VND</b>
+        </li>
+        <li>
+          <span class="activity-marker savings">S</span>
+          <span>
+            <strong>Emergency fund</strong>
+            <small>Savings jar</small>
+          </span>
+          <b>-1,500,000 VND</b>
+        </li>
+      </ul>
+    </section>
   </div>
-</main>
+
+  <!-- Updated Spending Statistics (7 Jars List) -->
+  <section aria-labelledby="refreshed-statistics-title" class="panel refreshed-statistics">
+    <div class="panel-heading">
+      <div>
+        <p class="eyebrow">New expense data</p>
+        <h2 id="refreshed-statistics-title">Updated spending statistics</h2>
+      </div>
+      <span class="statistics-period">April 2026</span>
+    </div>
+
+    <div class="refreshed-summary">
+      <div>
+        <span>Available after expenses</span>
+        <strong>133 VND</strong>
+      </div>
+      <div>
+        <span>Spent this month</span>
+        <strong>0 VND</strong>
+      </div>
+      <div>
+        <span>Share of income</span>
+        <strong>0.0% of income</strong>
+      </div>
+    </div>
+
+    <div class="refreshed-jar-list">
+      <div class="refreshed-jar-row">
+        <div class="refreshed-jar-heading">
+          <strong>Living Expenses</strong>
+          <span>0%</span>
+        </div>
+        <div role="progressbar" aria-valuemin="0" aria-valuemax="100" class="refreshed-progress" aria-valuenow="0">
+          <span style="width:0%"></span>
+        </div>
+        <small>0 / 47 VND</small>
+      </div>
+
+      <div class="refreshed-jar-row">
+        <div class="refreshed-jar-heading">
+          <strong>Food</strong>
+          <span>0%</span>
+        </div>
+        <div role="progressbar" aria-valuemin="0" aria-valuemax="100" class="refreshed-progress" aria-valuenow="0">
+          <span style="width:0%"></span>
+        </div>
+        <small>0 / 27 VND</small>
+      </div>
+
+      <div class="refreshed-jar-row">
+        <div class="refreshed-jar-heading">
+          <strong>Children</strong>
+          <span>0%</span>
+        </div>
+        <div role="progressbar" aria-valuemin="0" aria-valuemax="100" class="refreshed-progress" aria-valuenow="0">
+          <span style="width:0%"></span>
+        </div>
+        <small>0 / 13 VND</small>
+      </div>
+
+      <div class="refreshed-jar-row">
+        <div class="refreshed-jar-heading">
+          <strong>Emergency Fund</strong>
+          <span>0%</span>
+        </div>
+        <div role="progressbar" aria-valuemin="0" aria-valuemax="100" class="refreshed-progress" aria-valuenow="0">
+          <span style="width:0%"></span>
+        </div>
+        <small>0 / 13 VND</small>
+      </div>
+
+      <div class="refreshed-jar-row">
+        <div class="refreshed-jar-heading">
+          <strong>Savings</strong>
+          <span>0%</span>
+        </div>
+        <div role="progressbar" aria-valuemin="0" aria-valuemax="100" class="refreshed-progress" aria-valuenow="0">
+          <span style="width:0%"></span>
+        </div>
+        <small>0 / 13 VND</small>
+      </div>
+
+      <div class="refreshed-jar-row">
+        <div class="refreshed-jar-heading">
+          <strong>Investment</strong>
+          <span>0%</span>
+        </div>
+        <div role="progressbar" aria-valuemin="0" aria-valuemax="100" class="refreshed-progress" aria-valuenow="0">
+          <span style="width:0%"></span>
+        </div>
+        <small>0 / 13 VND</small>
+      </div>
+
+      <div class="refreshed-jar-row">
+        <div class="refreshed-jar-heading">
+          <strong>Entertainment &amp; Travel</strong>
+          <span>0%</span>
+        </div>
+        <div role="progressbar" aria-valuemin="0" aria-valuemax="100" class="refreshed-progress" aria-valuenow="0">
+          <span style="width:0%"></span>
+        </div>
+        <small>0 / 7 VND</small>
+      </div>
+    </div>
+  </section>
+</div>
