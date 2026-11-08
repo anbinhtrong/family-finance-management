@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router';
 import { AppLayoutComponent } from './layouts/app-layout/app-layout';
-import { HomePage } from './pages/home-page/home-page';
 
 export const routes: Routes = [
   {
@@ -9,8 +8,32 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        component: HomePage,
+        pathMatch: 'full',
+        redirectTo: 'dashboard',
+      },
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('./pages/home-page/home-page').then((m) => m.HomePage),
+      },
+      {
+        path: 'monthly-planning',
+        loadComponent: () =>
+          import('./pages/monthly-planning-page/monthly-planning-page').then(
+            (m) => m.MonthlyPlanningPage
+          ),
+      },
+      {
+        path: 'income-allocation',
+        loadComponent: () =>
+          import('./pages/income-allocation-page/income-allocation-page').then(
+            (m) => m.IncomeAllocationPage
+          ),
       },
     ],
+  },
+  {
+    path: '**',
+    redirectTo: 'dashboard',
   },
 ];

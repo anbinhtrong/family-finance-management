@@ -1,0 +1,237 @@
+<div class="page-main">
+  @if (!plan()) {
+    <!-- Empty State: Mockup f1-monthly-planning-unavailble.html -->
+    <a routerLink="/dashboard" class="back-link">
+      <span aria-hidden="true">‹</span> Back to dashboard
+    </a>
+    <section role="alert" class="state-panel error-state">
+      <label for="error-plan-month" class="month-label">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <rect x="3.5" y="5" width="17" height="15.5" rx="2" stroke="currentColor" stroke-width="1.8"></rect>
+          <path d="M7.5 3v4M16.5 3v4M4 9.5h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
+        </svg>
+        <select id="error-plan-month">
+          <option value="1">January 2026</option>
+          <option value="2">February 2026</option>
+          <option value="3">March 2026</option>
+          <option value="4">April 2026</option>
+          <option value="5">May 2026</option>
+          <option value="6">June 2026</option>
+          <option value="7">July 2026</option>
+          <option value="8">August 2026</option>
+          <option value="9" selected>September 2026</option>
+          <option value="10">October 2026</option>
+          <option value="11">November 2026</option>
+          <option value="12">December 2026</option>
+        </select>
+      </label>
+      <div aria-hidden="true" class="state-icon">!</div>
+      <h1>Monthly plan unavailable</h1>
+      <p>There is no monthly plan for this period yet.</p>
+      <div class="state-actions">
+        <button type="button" class="primary-link" (click)="createPlanNow()">Tạo kế hoạch ngay</button>
+      </div>
+    </section>
+  } @else {
+    <!-- Breadcrumb & Intro Header -->
+    <nav aria-label="Breadcrumb" class="breadcrumbs">
+      <a routerLink="/dashboard" aria-label="Home">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-6v-7h-4v7H4a1 1 0 0 1-1-1V10Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path>
+        </svg>
+      </a>
+      <span aria-hidden="true" class="breadcrumb-separator">/</span>
+      <a routerLink="/monthly-planning">Monthly planning</a>
+      <span aria-hidden="true" class="breadcrumb-separator">/</span>
+      <span aria-current="page">Kế hoạch tháng {{ plan()?.month }}/{{ plan()?.year }}</span>
+    </nav>
+
+    <section aria-labelledby="page-title" class="intro">
+      <div aria-hidden="true" class="intro-icon">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M12 3 4.5 6v5.4c0 4.5 3.2 7.8 7.5 9.6 4.3-1.8 7.5-5.1 7.5-9.6V6L12 3Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"></path>
+          <path d="m9 12 2 2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+      </div>
+      <div>
+        <h1 id="page-title">Kế hoạch ngân sách tháng {{ plan()?.month }}/{{ plan()?.year }}</h1>
+        <p class="intro-copy">Quản lý dự toán thu nhập và chi tiêu cho gia đình bạn.</p>
+      </div>
+    </section>
+
+    <!-- Planning Container with Dynamic Signals -->
+    <div class="planning-container">
+      <!-- Summary Cards -->
+      <div class="summary-cards">
+        <div class="summary-card income">
+          <span class="summary-label">Tổng dự kiến thu</span>
+          <strong class="summary-val">{{ totalIncome() | number }} đ</strong>
+        </div>
+        <div class="summary-card expense">
+          <span class="summary-label">Tổng dự kiến chi</span>
+          <strong class="summary-val">{{ totalExpense() | number }} đ</strong>
+        </div>
+        <div class="summary-card savings">
+          <span class="summary-label">Dự kiến tiết kiệm</span>
+          <strong class="summary-val">{{ netSavings() | number }} đ</strong>
+        </div>
+      </div>
+
+      <div class="content-grid">
+        <!-- Bảng Khoản Thu -->
+        <section aria-labelledby="income-title" class="panel planning-panel">
+          <div class="panel-heading">
+            <h2 id="income-title">Dự toán thu nhập</h2>
+            <span class="badge income-badge">{{ incomeItems().length }} khoản</span>
+          </div>
+
+          <div class="category-list">
+            @for (item of incomeItems(); track item.id) {
+              <div class="category-row">
+                <div class="category-info">
+                  <span class="category-name">{{ item.name }}</span>
+                  @if (item.note) {
+                    <small class="category-note">{{ item.note }}</small>
+                  }
+                </div>
+                <div class="input-control">
+                  <input
+                    type="number"
+                    [value]="item.plannedAmount"
+                    (input)="updateAmount(item, $event)"
+                    class="amount-input"
+                  />
+                  <span class="currency-label">VND</span>
+                </div>
+              </div>
+            }
+          </div>
+        </section>
+
+        <!-- Bảng Khoản Chi -->
+        <section aria-labelledby="expense-title" class="panel planning-panel">
+          <div class="panel-heading">
+            <h2 id="expense-title">Dự toán chi tiêu</h2>
+            <span class="badge expense-badge">{{ expenseItems().length }} khoản</span>
+          </div>
+
+          <div class="category-list">
+            @for (item of expenseItems(); track item.id) {
+              <div class="category-row">
+                <div class="category-info">
+                  <span class="category-name">{{ item.name }}</span>
+                  @if (item.note) {
+                    <small class="category-note">{{ item.note }}</small>
+                  }
+                </div>
+                <div class="input-control">
+                  <input
+                    type="number"
+                    [value]="item.plannedAmount"
+                    (input)="updateAmount(item, $event)"
+                    class="amount-input"
+                  />
+                  <span class="currency-label">VND</span>
+                </div>
+              </div>
+            }
+          </div>
+        </section>
+      </div>
+
+      <!-- Action Footer -->
+      <div class="planning-actions">
+        <button type="button" class="btn btn-secondary" (click)="switchToEmptyState()">
+          Mô phỏng chưa có kế hoạch
+        </button>
+        <button type="button" class="btn btn-primary" (click)="onSave()">
+          Xác nhận kế hoạch
+        </button>
+      </div>
+
+      <!-- 7 Default Jars Preview (from Mockup) -->
+      <section aria-labelledby="allocation-title" class="panel allocation-panel">
+        <div class="allocation-heading">
+          <div>
+            <p class="eyebrow">Fixed allocation</p>
+            <h2 id="allocation-title">Phân bổ 7 hũ ngân sách mặc định</h2>
+          </div>
+          <span class="allocation-status">
+            <span aria-hidden="true" class="status-check">✓</span> 100% allocated
+          </span>
+        </div>
+        <p class="allocation-copy">Tỷ lệ cố định chuẩn cho phân bổ tài chính gia đình.</p>
+
+        <ul aria-label="Default jar allocation" class="allocation-grid">
+          <li class="jar jar-living">
+            <div aria-hidden="true" class="jar-icon">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-6v-7h-4v7H4a1 1 0 0 1-1-1V10Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"></path>
+              </svg>
+            </div>
+            <h3 class="jar-name">Living Expenses</h3>
+            <p class="jar-rate">35%</p>
+          </li>
+          <li class="jar jar-food">
+            <div aria-hidden="true" class="jar-icon">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M7 3v7m-3-7v4a3 3 0 0 0 6 0V3m-3 7v11m10-18v18m0-18c-2.2 2.1-3 4.4-3 7h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+              </svg>
+            </div>
+            <h3 class="jar-name">Food</h3>
+            <p class="jar-rate">20%</p>
+          </li>
+          <li class="jar jar-children">
+            <div aria-hidden="true" class="jar-icon">
+              <svg viewBox="0 0 24 24" fill="none">
+                <circle cx="9" cy="8" r="3" stroke="currentColor" stroke-width="1.8"></circle>
+                <circle cx="17" cy="9" r="2.3" stroke="currentColor" stroke-width="1.8"></circle>
+                <path d="M3.5 20v-1.5a5.5 5.5 0 0 1 11 0V20h-11Zm12-5a4 4 0 0 1 5 3.8V20h-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+              </svg>
+            </div>
+            <h3 class="jar-name">Children</h3>
+            <p class="jar-rate">10%</p>
+          </li>
+          <li class="jar jar-emergencyFund">
+            <div aria-hidden="true" class="jar-icon">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M12 3 4.5 6v5.4c0 4.5 3.2 7.8 7.5 9.6 4.3-1.8 7.5-5.1 7.5-9.6V6L12 3Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"></path>
+                <path d="M12 8v8m-4-4h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
+              </svg>
+            </div>
+            <h3 class="jar-name">Emergency Fund</h3>
+            <p class="jar-rate">10%</p>
+          </li>
+          <li class="jar jar-savings">
+            <div aria-hidden="true" class="jar-icon">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M4 19V9m5 10V5m5 14v-7m5 7V3M2 20h20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+              </svg>
+            </div>
+            <h3 class="jar-name">Savings</h3>
+            <p class="jar-rate">10%</p>
+          </li>
+          <li class="jar jar-investment">
+            <div aria-hidden="true" class="jar-icon">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M3 17 9 11l4 4 8-9M15 6h6v6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+              </svg>
+            </div>
+            <h3 class="jar-name">Investment</h3>
+            <p class="jar-rate">10%</p>
+          </li>
+          <li class="jar jar-travel">
+            <div aria-hidden="true" class="jar-icon">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="m3 11 18-8-8 18-2.7-7.3L3 11Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"></path>
+                <path d="m10.3 13.7 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
+              </svg>
+            </div>
+            <h3 class="jar-name">Entertainment &amp; Travel</h3>
+            <p class="jar-rate">5%</p>
+          </li>
+        </ul>
+      </section>
+    </div>
+  }
+</div>

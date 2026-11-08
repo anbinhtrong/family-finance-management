@@ -1,0 +1,156 @@
+<div class=page-main>
+                        <section aria-labelledby=plan-title class=plan-content><a routerlink=/monthly-planning class=back-link
+                                href=http://localhost:4200/monthly-planning><span
+                                    aria-hidden=true>‹</span> Back to monthly planning </a>
+                            <h1 id=plan-title>Month Budget Summary</h1><label for=plan-month class=month-label><svg viewBox="0 0 24 24" fill=none aria-hidden=true>
+                                    <rect x=3.5 y=5 width=17 height=15.5 rx=2
+                                        stroke=currentColor stroke-width=1.8></rect>
+                                    <path d="M7.5 3v4M16.5 3v4M4 9.5h16" stroke=currentColor
+                                        stroke-width=1.8 stroke-linecap=round></path>
+                                </svg><select id=plan-month>
+                                    <option value=1>January 2026
+                                    <option value=2>February 2026
+                                    <option value=3>March 2026
+                                    <option value=4>April 2026
+                                    <option value=5>May 2026
+                                    <option value=6>June 2026
+                                    <option value=7>July 2026
+                                    <option value=8>August 2026
+                                    <option value=9>September 2026
+                                    <option value=10>October 2026
+                                    <option value=11 selected>November 2026
+                                    <option value=12>December 2026
+                                </select></label>
+                            <section aria-labelledby=summary-heading class=summary>
+                                <div class=income>
+                                    <div aria-hidden=true class=income-icon><svg viewBox="0 0 24 24" fill=none>
+                                            <path
+                                                d="M12 2.8v18.4M17 6.2c-.9-1-2.4-1.6-4.5-1.6-2.4 0-4 1.1-4 2.8 0 4.6 9.5 1.5 9.5 6.7 0 2-1.9 3.5-4.9 3.5-2 0-3.7-.6-5-1.8"
+                                                stroke=currentColor stroke-width=1.8 stroke-linecap=round></path>
+                                        </svg></div>
+                                    <div id=summary-heading class=income-label>Total monthly
+                                        income</div>
+                                    <div class=income-value>123,456,789 VND</div>
+                                    <div class=income-meta>Monthly plan for November 2026
+                                    </div>
+                                </div>
+                                <div class=allocation>
+                                    <div aria-label="100 percent allocated" class=donut
+                                        style="background:conic-gradient(var(--f1-jar-living) 0% 35%,var(--f1-jar-food) 35% 55%,var(--f1-jar-children) 55% 65%,var(--f1-jar-emergency) 65% 75%,var(--f1-jar-savings) 75% 85%,var(--f1-jar-investment) 85% 95%,var(--f1-jar-travel) 95% 100%)">
+                                        <div class=donut-label><strong>100%</strong><span>allocated</span></div>
+                                    </div>
+                                    <div aria-label="Jar allocation legend" class=legend>
+                                        <div class=legend-item><span
+                                                class="legend-name jar-living">Living Expenses</span><span class=legend-rate>35%</span></div>
+                                        <div class=legend-item><span
+                                                class="legend-name jar-food">Food</span><span
+                                                class=legend-rate>20%</span></div>
+                                        <div class=legend-item><span
+                                                class="legend-name jar-children">Children</span><span class=legend-rate>10%</span></div>
+                                        <div class=legend-item><span
+                                                class="legend-name jar-emergency">Emergency Fund</span><span class=legend-rate>10%</span></div>
+                                        <div class=legend-item><span
+                                                class="legend-name jar-savings">Savings</span><span class=legend-rate>10%</span></div>
+                                        <div class=legend-item><span
+                                                class="legend-name jar-investment">Investment</span><span class=legend-rate>10%</span></div>
+                                        <div class=legend-item><span
+                                                class="legend-name jar-travel">Entertainment &amp; Travel</span><span class=legend-rate>5%</span></div>
+                                    </div>
+                                </div>
+                            </section>
+                            <section aria-labelledby=jars-heading>
+                                <h2 id=jars-heading class=section-title>The Seven Jars</h2>
+                                <p class=section-copy>Your income is allocated to 7 jars based
+                                    on the default rates.
+                                <div class=jar-grid>
+                                    <article class="jar-card jar-living">
+                                        <div aria-hidden=true class=jar-icon><svg viewBox="0 0 24 24" fill=none>
+                                                <path
+                                                    d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-6v-7h-4v7H4a1 1 0 0 1-1-1V10Z"
+                                                    stroke=currentColor stroke-width=1.8 stroke-linejoin=round></path>
+                                            </svg></div>
+                                        <div class=jar-name>Living Expenses</div>
+                                        <div class=jar-rate>35%</div>
+                                        <div class=jar-amount>43,209,876 VND</div>
+                                        <div aria-hidden=true class=meter><span style=width:63%></span></div>
+                                    </article>
+                                    <article class="jar-card jar-food">
+                                        <div aria-hidden=true class=jar-icon><svg viewBox="0 0 24 24" fill=none>
+                                                <path
+                                                    d="M7 3v7m-3-7v4a3 3 0 0 0 6 0V3m-3 7v11m10-18v18m0-18c-2.2 2.1-3 4.4-3 7h3"
+                                                    stroke=currentColor stroke-width=1.8 stroke-linecap=round
+                                                    stroke-linejoin=round></path>
+                                            </svg></div>
+                                        <div class=jar-name>Food</div>
+                                        <div class=jar-rate>20%</div>
+                                        <div class=jar-amount>24,691,358 VND</div>
+                                        <div aria-hidden=true class=meter><span style=width:36%></span></div>
+                                    </article>
+                                    <article class="jar-card jar-children">
+                                        <div aria-hidden=true class=jar-icon><svg viewBox="0 0 24 24" fill=none>
+                                                <circle cx=9 cy=8 r=3 stroke=currentColor
+                                                    stroke-width=1.8></circle>
+                                                <circle cx=17 cy=9 r=2.3 stroke=currentColor
+                                                    stroke-width=1.8></circle>
+                                                <path
+                                                    d="M3.5 20v-1.5a5.5 5.5 0 0 1 11 0V20h-11Zm12-5a4 4 0 0 1 5 3.8V20h-3"
+                                                    stroke=currentColor stroke-width=1.8 stroke-linecap=round
+                                                    stroke-linejoin=round></path>
+                                            </svg></div>
+                                        <div class=jar-name>Children</div>
+                                        <div class=jar-rate>10%</div>
+                                        <div class=jar-amount>12,345,679 VND</div>
+                                        <div aria-hidden=true class=meter><span style=width:18%></span></div>
+                                    </article>
+                                    <article class="jar-card jar-emergency">
+                                        <div aria-hidden=true class=jar-icon><svg viewBox="0 0 24 24" fill=none>
+                                                <path
+                                                    d="M12 3 4.5 6v5.4c0 4.5 3.2 7.8 7.5 9.6 4.3-1.8 7.5-5.1 7.5-9.6V6L12 3Z"
+                                                    stroke=currentColor stroke-width=1.8 stroke-linejoin=round></path>
+                                                <path d="M12 8v8m-4-4h8" stroke=currentColor
+                                                    stroke-width=1.8 stroke-linecap=round></path>
+                                            </svg></div>
+                                        <div class=jar-name>Emergency Fund</div>
+                                        <div class=jar-rate>10%</div>
+                                        <div class=jar-amount>12,345,679 VND</div>
+                                        <div aria-hidden=true class=meter><span style=width:18%></span></div>
+                                    </article>
+                                    <article class="jar-card jar-savings">
+                                        <div aria-hidden=true class=jar-icon><svg viewBox="0 0 24 24" fill=none>
+                                                <path d="M4 19V9m5 10V5m5 14v-7m5 7V3M2 20h20"
+                                                    stroke=currentColor stroke-width=1.8 stroke-linecap=round
+                                                    stroke-linejoin=round></path>
+                                            </svg></div>
+                                        <div class=jar-name>Savings</div>
+                                        <div class=jar-rate>10%</div>
+                                        <div class=jar-amount>12,345,679 VND</div>
+                                        <div aria-hidden=true class=meter><span style=width:18%></span></div>
+                                    </article>
+                                    <article class="jar-card jar-investment">
+                                        <div aria-hidden=true class=jar-icon><svg viewBox="0 0 24 24" fill=none>
+                                                <path d="M3 17 9 11l4 4 8-9M15 6h6v6"
+                                                    stroke=currentColor stroke-width=1.8 stroke-linecap=round
+                                                    stroke-linejoin=round></path>
+                                            </svg></div>
+                                        <div class=jar-name>Investment</div>
+                                        <div class=jar-rate>10%</div>
+                                        <div class=jar-amount>12,345,679 VND</div>
+                                        <div aria-hidden=true class=meter><span style=width:18%></span></div>
+                                    </article>
+                                    <article class="jar-card jar-travel">
+                                        <div aria-hidden=true class=jar-icon><svg viewBox="0 0 24 24" fill=none>
+                                                <path d="m3 11 18-8-8 18-2.7-7.3L3 11Z"
+                                                    stroke=currentColor stroke-width=1.8 stroke-linejoin=round></path>
+                                                <path d="m10.3 13.7 5-5" stroke=currentColor
+                                                    stroke-width=1.8 stroke-linecap=round></path>
+                                            </svg></div>
+                                        <div class=jar-name>Entertainment &amp; Travel</div>
+                                        <div class=jar-rate>5%</div>
+                                        <div class=jar-amount>6,172,839 VND</div>
+                                        <div aria-hidden=true class=meter><span style=width:9%></span></div>
+                                    </article>
+                                </div>
+                            </section>
+                        </section>
+                    </div>
+                </div>

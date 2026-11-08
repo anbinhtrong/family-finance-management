@@ -1,0 +1,389 @@
+
+    :host {
+        display: block;
+        min-height: 100dvh;
+        color: var(--f1-charcoal);
+        background: var(--f1-bg)
+    }
+
+    .shell {
+        display: flex;
+        width: min(1440px, 100%);
+        min-height: calc(100dvh - 60px);
+        margin: 0 auto
+    }
+
+    .page-main {
+        flex: 1;
+        min-width: 0;
+        padding: 16px 28px 48px
+    }
+
+    .plan-content {
+        width: 100%
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--f1-slate);
+        font-size: 0.6875rem;
+        text-decoration: none
+    }
+
+    .back-link span {
+        font-size: 1.25rem;
+        line-height: 0.5;
+        transform: translateY(-1px)
+    }
+
+    h1,
+    h2 {
+        color: var(--f1-charcoal)
+    }
+
+    h1 {
+        margin: 10px 0 7px;
+        font-size: clamp(1.5rem, 3vw, 1.75rem);
+        line-height: 1.2
+    }
+
+    .month-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin: 0;
+        color: var(--f1-charcoal);
+        font-size: 0.875rem
+    }
+
+    .month-label svg {
+        width: 18px;
+        height: 18px;
+        flex: 0 0 18px
+    }
+
+    .month-label select {
+        min-width: 170px;
+        padding: 5px 28px 5px 4px;
+        border: 0;
+        color: inherit;
+        background: var(--f1-bg);
+        font: inherit;
+        cursor: pointer
+    }
+
+    .summary {
+        display: grid;
+        grid-template-columns: 260px 1fr;
+        gap: 18px;
+        align-items: center;
+        min-height: 140px;
+        padding: 20px;
+        margin-top: 18px;
+        border: 1px solid var(--f1-grey);
+        border-radius: 7px;
+        background: var(--f1-surface)
+    }
+
+    .income {
+        display: grid;
+        grid-template-columns: 38px 1fr;
+        column-gap: 9px;
+        align-items: start;
+        min-height: 98px;
+        padding-right: 18px;
+        border-right: 1px solid var(--f1-grey)
+    }
+
+    .income-icon {
+        display: grid;
+        width: 38px;
+        height: 38px;
+        place-items: center;
+        border-radius: 50%;
+        color: var(--f1-jar-investment);
+        background: var(--f1-jar-investment-tint);
+        font-size: 1.125rem
+    }
+
+    .income-icon svg {
+        width: 20px;
+        height: 20px
+    }
+
+    .income-label {
+        padding-top: 2px;
+        font-size: 0.875rem;
+        font-weight: 600
+    }
+
+    .income-value {
+        grid-column: 2;
+        margin-top: 4px;
+        font-size: 1.3125rem;
+        font-weight: 700;
+        white-space: nowrap
+    }
+
+    .income-meta {
+        grid-column: 2;
+        margin-top: 13px;
+        color: var(--f1-slate);
+        font-size: 0.625rem
+    }
+
+    .allocation {
+        display: grid;
+        grid-template-columns: 190px 1fr;
+        gap: 18px;
+        align-items: center
+    }
+
+    .donut {
+        position: relative;
+        display: grid;
+        width: 106px;
+        height: 106px;
+        place-items: center;
+        margin: auto;
+        border-radius: 50%
+    }
+
+    .donut::after {
+        position: absolute;
+        width: 78px;
+        height: 78px;
+        border-radius: 50%;
+        background: var(--f1-surface);
+        content: ""
+    }
+
+    .donut-label {
+        z-index: 1;
+        position: relative;
+        text-align: center
+    }
+
+    .donut-label strong,
+    .donut-label span {
+        display: block
+    }
+
+    .donut-label strong {
+        font-size: 0.75rem
+    }
+
+    .donut-label span {
+        margin-top: 3px;
+        font-size: 0.625rem
+    }
+
+    .legend {
+        display: grid;
+        grid-template-columns: 1fr 42px;
+        gap: 8px 10px;
+        font-size: 0.6875rem
+    }
+
+    .legend-item {
+        display: contents
+    }
+
+    .legend-name::before {
+        display: inline-block;
+        width: 9px;
+        height: 9px;
+        margin-right: 9px;
+        border-radius: 50%;
+        background: var(--jar-color);
+        content: ""
+    }
+
+    .legend-rate {
+        font-size: 0.625rem;
+        font-weight: 600
+    }
+
+    .section-title {
+        margin: 34px 0 2px;
+        font-size: 1.25rem
+    }
+
+    .section-copy {
+        margin: 0;
+        color: var(--f1-jar-investment);
+        font-size: 0.625rem
+    }
+
+    .jar-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 17px 19px;
+        margin-top: 18px
+    }
+
+    .jar-card {
+        position: relative;
+        min-height: 153px;
+        overflow: hidden;
+        padding: 24px 16px 16px;
+        border: 1px solid var(--f1-grey);
+        border-radius: 6px;
+        background: var(--jar-tint)
+    }
+
+    .jar-card::before {
+        position: absolute;
+        inset: 0 0 auto;
+        height: 4px;
+        background: var(--jar-color);
+        content: ""
+    }
+
+    .jar-icon {
+        display: grid;
+        width: 36px;
+        height: 36px;
+        place-items: center;
+        margin-bottom: 7px;
+        border-radius: 50%;
+        color: var(--jar-color);
+        background: var(--jar-icon-tint);
+        font-size: 1.0625rem
+    }
+
+    .jar-icon svg {
+        width: 19px;
+        height: 19px
+    }
+
+    .jar-name {
+        min-height: 18px;
+        font-size: 0.875rem;
+        font-weight: 600
+    }
+
+    .jar-rate {
+        margin-top: 2px;
+        color: var(--jar-color);
+        font-size: 1.625rem;
+        line-height: 30px;
+        font-weight: 700
+    }
+
+    .jar-amount {
+        margin-top: 1px;
+        color: var(--f1-slate);
+        font-size: 0.625rem
+    }
+
+    .meter {
+        height: 6px;
+        overflow: hidden;
+        margin-top: 13px;
+        border-radius: 3px;
+        background: var(--f1-grey)
+    }
+
+    .meter span {
+        display: block;
+        height: 100%;
+        border-radius: inherit;
+        background: var(--jar-color)
+    }
+
+    .jar-living {
+        --jar-color: var(--f1-jar-living);
+        --jar-tint: var(--f1-jar-living-tint);
+        --jar-icon-tint: #ffdfe3
+    }
+
+    .jar-food {
+        --jar-color: var(--f1-jar-food);
+        --jar-tint: var(--f1-jar-food-tint);
+        --jar-icon-tint: #ffedc9
+    }
+
+    .jar-children {
+        --jar-color: var(--f1-jar-children);
+        --jar-tint: var(--f1-jar-children-tint);
+        --jar-icon-tint: #e8ddff
+    }
+
+    .jar-emergency {
+        --jar-color: var(--f1-jar-emergency);
+        --jar-tint: var(--f1-jar-emergency-tint);
+        --jar-icon-tint: #d5f4e9
+    }
+
+    .jar-savings {
+        --jar-color: var(--f1-jar-savings);
+        --jar-tint: var(--f1-jar-savings-tint);
+        --jar-icon-tint: #d5f4e9
+    }
+
+    .jar-investment {
+        --jar-color: var(--f1-jar-investment);
+        --jar-tint: var(--f1-jar-investment-tint);
+        --jar-icon-tint: #d9ebff
+    }
+
+    .jar-travel {
+        --jar-color: var(--f1-jar-travel);
+        --jar-tint: var(--f1-jar-travel-tint);
+        --jar-icon-tint: #e8ddff
+    }
+
+    @keyframes _ngcontent-ng-c3467979985_spin {
+        to {
+            transform: rotate(360deg)
+        }
+    }
+
+    @media (max-width:980px) {
+        .jar-grid {
+            grid-template-columns: repeat(3, 1fr)
+        }
+    }
+
+    @media (max-width:760px) {
+        .page-main {
+            padding: 18px 16px 38px
+        }
+
+        .summary {
+            grid-template-columns: 1fr
+        }
+
+        .income {
+            min-height: auto;
+            padding: 0 0 18px;
+            border-right: 0;
+            border-bottom: 1px solid var(--f1-grey)
+        }
+
+        .allocation {
+            grid-template-columns: 150px 1fr
+        }
+
+        .jar-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px
+        }
+    }
+
+    @media (max-width:430px) {
+        .allocation {
+            grid-template-columns: 1fr
+        }
+
+        .donut {
+            margin: 0 auto 4px
+        }
+
+        .jar-grid {
+            grid-template-columns: 1fr
+        }
+    }
