@@ -28,8 +28,8 @@
         </select>
       </label>
 
-      <button type="button" class="btn-recalculate" (click)="recalculateByRate()">
-        Tự động chia theo tỷ lệ chuẩn
+      <button type="button" class="btn-recalculate" (click)="autoAllocate()">
+        Auto-allocate standard rates (100%)
       </button>
     </div>
 
@@ -46,8 +46,9 @@
           <input
             type="number"
             class="income-input"
-            [value]="monthlyIncome()"
-            (input)="updateIncome($event)"
+            [value]="totalIncome()"
+            (input)="onTotalIncomeChange($event)"
+            min="0"
           />
           <span class="currency-tag">VND</span>
         </div>
@@ -55,7 +56,7 @@
       </div>
 
       <div class="allocation">
-        <div aria-label="100 percent allocated" class="donut"
+        <div aria-label="Allocated percentage" class="donut"
           style="background:conic-gradient(var(--f1-jar-living) 0% 35%,var(--f1-jar-food) 35% 55%,var(--f1-jar-children) 55% 65%,var(--f1-jar-emergency) 65% 75%,var(--f1-jar-savings) 75% 85%,var(--f1-jar-investment) 85% 95%,var(--f1-jar-travel) 95% 100%)">
           <div class="donut-label">
             <strong>{{ allocationPercentage() }}%</strong>
@@ -96,29 +97,51 @@
       </div>
     </section>
 
-    <!-- Allocation Status Bar -->
+    <!-- Allocation Status Bar with Warnings & Indicators -->
     <div class="status-bar" [class.valid]="isValid()" [class.invalid]="!isValid()">
-      <div class="status-metric">
-        <span>Tổng đã phân bổ:</span>
-        <strong>{{ totalAllocated() | number }} VND</strong>
+      <div class="status-metrics-group">
+        <div class="status-metric">
+          <span>Total allocated:</span>
+          <strong>{{ totalAllocated() | number }} VND</strong>
+        </div>
+
+        <div class="status-metric">
+          <span>Remaining unallocated:</span>
+          <strong [class.text-danger]="remainingAmount() !== 0" [class.text-success]="remainingAmount() === 0">
+            {{ remainingAmount() | number }} VND
+          </strong>
+        </div>
       </div>
-      <div class="status-metric">
-        <span>Còn lại:</span>
-        <strong [class.text-danger]="remainingAmount() !== 0">{{ remainingAmount() | number }} VND</strong>
+
+      <div class="status-actions">
+        @if (remainingAmount() !== 0) {
+          <span class="warning-text">
+            @if (remainingAmount() > 0) {
+              ⚠️ Please allocate the remaining {{ remainingAmount() | number }} VND across jars.
+            } @else {
+              ⚠️ Total allocation exceeds income by {{ (remainingAmount() * -1) | number }} VND.
+            }
+          </span>
+        } @else if (!noNegativeValues()) {
+          <span class="warning-text">⚠️ No jar amount can be negative.</span>
+        } @else if (isConfirmed()) {
+          <span class="confirmed-badge">✓ Allocation confirmed</span>
+        }
+
+        <button
+          type="button"
+          class="confirm-btn"
+          [disabled]="!isValid()"
+          (click)="onConfirm()">
+          Confirm Allocation
+        </button>
       </div>
-      <button
-        type="button"
-        class="confirm-btn"
-        [disabled]="!isValid()"
-        (click)="onSave()">
-        Xác nhận phân bổ
-      </button>
     </div>
 
     <!-- The Seven Jars Grid -->
     <section aria-labelledby="jars-heading">
       <h2 id="jars-heading" class="section-title">The Seven Jars</h2>
-      <p class="section-copy">Phân bổ thu nhập vào 7 hũ tài chính theo tỷ lệ chuẩn hoặc nhập tay số tiền.</p>
+      <p class="section-copy">Income is allocated across the 7 jars based on standard rates or custom manual inputs.</p>
 
       <div class="jar-grid">
         @for (jar of jars(); track jar.id) {
@@ -167,20 +190,21 @@
               }
             </div>
             <div class="jar-name">{{ jar.name }}</div>
-            <div class="jar-rate">{{ jar.defaultRate }}%</div>
-            
+            <div class="jar-rate">{{ jar.defaultRate }}% standard rate</div>
+
             <div class="jar-amount-control">
               <input
                 type="number"
                 class="jar-input"
                 [value]="jar.allocatedAmount"
-                (input)="updateJarAmount(jar, $event)"
+                (input)="onJarAmountChange(jar, $event)"
+                min="0"
               />
               <span class="jar-currency">VND</span>
             </div>
 
             <div aria-hidden="true" class="meter">
-              <span [style.width.%]="monthlyIncome() > 0 ? (jar.allocatedAmount / monthlyIncome()) * 100 : 0"></span>
+              <span [style.width.%]="totalIncome() > 0 ? (jar.allocatedAmount / totalIncome()) * 100 : 0"></span>
             </div>
           </article>
         }

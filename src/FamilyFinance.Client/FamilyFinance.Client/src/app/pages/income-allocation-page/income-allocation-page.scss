@@ -281,6 +281,13 @@ h1 {
     border-left: 4px solid var(--f1-red, #f04452);
   }
 
+  .status-metrics-group {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
   .status-metric {
     display: flex;
     align-items: center;
@@ -295,11 +302,37 @@ h1 {
       &.text-danger {
         color: var(--f1-red, #f04452);
       }
+
+      &.text-success {
+        color: var(--f1-green, #0d927d);
+      }
     }
   }
 
+  .status-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .warning-text {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: var(--f1-red, #f04452);
+  }
+
+  .confirmed-badge {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: var(--f1-green, #0d927d);
+    background: var(--f1-green-tint, #d2f4f1);
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+
   .confirm-btn {
-    padding: 8px 24px;
+    padding: 9px 24px;
     border-radius: 6px;
     border: none;
     font-weight: 700;
@@ -307,10 +340,14 @@ h1 {
     color: var(--f1-surface, #ffffff);
     background: var(--f1-green, #0d927d);
     cursor: pointer;
-    transition: opacity 0.15s;
+    transition: opacity 0.15s, background-color 0.15s;
+
+    &:hover:not(:disabled) {
+      opacity: 0.9;
+    }
 
     &:disabled {
-      opacity: 0.5;
+      opacity: 0.45;
       cursor: not-allowed;
       background: var(--f1-slate, #5e7fa5);
     }
@@ -457,4 +494,3 @@ h1 {
     text-align: center;
   }
 }
-

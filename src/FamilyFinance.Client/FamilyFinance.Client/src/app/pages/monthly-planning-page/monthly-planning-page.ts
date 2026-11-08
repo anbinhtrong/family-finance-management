@@ -15,10 +15,10 @@ import { PlanCategoryItem } from '../../features/monthly-planning/models/monthly
 export class MonthlyPlanningPage {
   private planService = inject(MonthlyPlanService);
 
-  // Lấy dữ liệu từ service ra signal nội bộ để edit thủ công
+  // Read data from service into component signal
   plan = signal(this.planService.currentPlan());
 
-  // Tách danh sách theo loại thu / chi
+  // Filter items by type
   incomeItems = computed(() =>
     this.plan()?.items.filter((i) => i.type === 'Income') ?? []
   );
@@ -27,7 +27,7 @@ export class MonthlyPlanningPage {
     this.plan()?.items.filter((i) => i.type === 'Expense') ?? []
   );
 
-  // Tự động tính tổng bằng computed()
+  // Automatically compute totals
   totalIncome = computed(() =>
     this.incomeItems().reduce((acc, cur) => acc + (Number(cur.plannedAmount) || 0), 0)
   );
@@ -38,11 +38,10 @@ export class MonthlyPlanningPage {
 
   netSavings = computed(() => this.totalIncome() - this.totalExpense());
 
-  // Các actions thủ công
+  // Reactive actions
   updateAmount(item: PlanCategoryItem, event: Event): void {
     const val = Number((event.target as HTMLInputElement).value) || 0;
     item.plannedAmount = val;
-    // Trigger signal cập nhật
     this.plan.update((prev) => (prev ? { ...prev } : null));
   }
 
@@ -57,7 +56,7 @@ export class MonthlyPlanningPage {
       netSavings: this.netSavings(),
       status: 'Confirmed',
     });
-    alert('Lưu kế hoạch tháng thành công!');
+    alert('Monthly plan saved successfully!');
   }
 
   createPlanNow(): void {

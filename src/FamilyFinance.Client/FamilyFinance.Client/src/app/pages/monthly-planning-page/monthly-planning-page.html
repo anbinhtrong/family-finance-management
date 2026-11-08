@@ -4,6 +4,7 @@
     <a routerLink="/dashboard" class="back-link">
       <span aria-hidden="true">‹</span> Back to dashboard
     </a>
+
     <section role="alert" class="state-panel error-state">
       <label for="error-plan-month" class="month-label">
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -29,7 +30,7 @@
       <h1>Monthly plan unavailable</h1>
       <p>There is no monthly plan for this period yet.</p>
       <div class="state-actions">
-        <button type="button" class="primary-link" (click)="createPlanNow()">Tạo kế hoạch ngay</button>
+        <button type="button" class="primary-link" (click)="createPlanNow()">Create a plan</button>
       </div>
     </section>
   } @else {
@@ -43,7 +44,7 @@
       <span aria-hidden="true" class="breadcrumb-separator">/</span>
       <a routerLink="/monthly-planning">Monthly planning</a>
       <span aria-hidden="true" class="breadcrumb-separator">/</span>
-      <span aria-current="page">Kế hoạch tháng {{ plan()?.month }}/{{ plan()?.year }}</span>
+      <span aria-current="page">Plan for {{ plan()?.month }}/{{ plan()?.year }}</span>
     </nav>
 
     <section aria-labelledby="page-title" class="intro">
@@ -54,8 +55,8 @@
         </svg>
       </div>
       <div>
-        <h1 id="page-title">Kế hoạch ngân sách tháng {{ plan()?.month }}/{{ plan()?.year }}</h1>
-        <p class="intro-copy">Quản lý dự toán thu nhập và chi tiêu cho gia đình bạn.</p>
+        <h1 id="page-title">Monthly Budget Plan ({{ plan()?.month }}/{{ plan()?.year }})</h1>
+        <p class="intro-copy">Manage your income forecasts and expense allocations for your family.</p>
       </div>
     </section>
 
@@ -64,25 +65,25 @@
       <!-- Summary Cards -->
       <div class="summary-cards">
         <div class="summary-card income">
-          <span class="summary-label">Tổng dự kiến thu</span>
-          <strong class="summary-val">{{ totalIncome() | number }} đ</strong>
+          <span class="summary-label">Total Planned Income</span>
+          <strong class="summary-val">{{ totalIncome() | number }} VND</strong>
         </div>
         <div class="summary-card expense">
-          <span class="summary-label">Tổng dự kiến chi</span>
-          <strong class="summary-val">{{ totalExpense() | number }} đ</strong>
+          <span class="summary-label">Total Planned Expense</span>
+          <strong class="summary-val">{{ totalExpense() | number }} VND</strong>
         </div>
         <div class="summary-card savings">
-          <span class="summary-label">Dự kiến tiết kiệm</span>
-          <strong class="summary-val">{{ netSavings() | number }} đ</strong>
+          <span class="summary-label">Expected Net Savings</span>
+          <strong class="summary-val">{{ netSavings() | number }} VND</strong>
         </div>
       </div>
 
       <div class="content-grid">
-        <!-- Bảng Khoản Thu -->
+        <!-- Income Forecast Section -->
         <section aria-labelledby="income-title" class="panel planning-panel">
           <div class="panel-heading">
-            <h2 id="income-title">Dự toán thu nhập</h2>
-            <span class="badge income-badge">{{ incomeItems().length }} khoản</span>
+            <h2 id="income-title">Income Forecast</h2>
+            <span class="badge income-badge">{{ incomeItems().length }} items</span>
           </div>
 
           <div class="category-list">
@@ -100,6 +101,7 @@
                     [value]="item.plannedAmount"
                     (input)="updateAmount(item, $event)"
                     class="amount-input"
+                    min="0"
                   />
                   <span class="currency-label">VND</span>
                 </div>
@@ -108,11 +110,11 @@
           </div>
         </section>
 
-        <!-- Bảng Khoản Chi -->
+        <!-- Expense Forecast Section -->
         <section aria-labelledby="expense-title" class="panel planning-panel">
           <div class="panel-heading">
-            <h2 id="expense-title">Dự toán chi tiêu</h2>
-            <span class="badge expense-badge">{{ expenseItems().length }} khoản</span>
+            <h2 id="expense-title">Expense Budget</h2>
+            <span class="badge expense-badge">{{ expenseItems().length }} items</span>
           </div>
 
           <div class="category-list">
@@ -130,6 +132,7 @@
                     [value]="item.plannedAmount"
                     (input)="updateAmount(item, $event)"
                     class="amount-input"
+                    min="0"
                   />
                   <span class="currency-label">VND</span>
                 </div>
@@ -142,10 +145,10 @@
       <!-- Action Footer -->
       <div class="planning-actions">
         <button type="button" class="btn btn-secondary" (click)="switchToEmptyState()">
-          Mô phỏng chưa có kế hoạch
+          Simulate Unavailable Plan
         </button>
         <button type="button" class="btn btn-primary" (click)="onSave()">
-          Xác nhận kế hoạch
+          Confirm Plan
         </button>
       </div>
 
@@ -154,13 +157,13 @@
         <div class="allocation-heading">
           <div>
             <p class="eyebrow">Fixed allocation</p>
-            <h2 id="allocation-title">Phân bổ 7 hũ ngân sách mặc định</h2>
+            <h2 id="allocation-title">Your default 7-jar allocation</h2>
           </div>
           <span class="allocation-status">
             <span aria-hidden="true" class="status-check">✓</span> 100% allocated
           </span>
         </div>
-        <p class="allocation-copy">Tỷ lệ cố định chuẩn cho phân bổ tài chính gia đình.</p>
+        <p class="allocation-copy">These rates are fixed for your standard family budget plan.</p>
 
         <ul aria-label="Default jar allocation" class="allocation-grid">
           <li class="jar jar-living">
