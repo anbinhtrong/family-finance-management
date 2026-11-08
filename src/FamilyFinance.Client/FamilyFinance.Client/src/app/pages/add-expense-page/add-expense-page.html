@@ -1,0 +1,152 @@
+<div class="page-main">
+  <a routerLink="/dashboard" class="back-link">
+    <span aria-hidden="true">‹</span> Back to dashboard
+  </a>
+
+  <section aria-labelledby="expense-title" class="page-intro">
+    <h1 id="expense-title">Add an expense</h1>
+    <p>Record a purchase and assign it to the right jar in your monthly plan.</p>
+  </section>
+
+  <div class="expense-layout">
+    <!-- Left Column: Details Form Panel -->
+    <form (submit)="onSubmit($event)" novalidate class="details-panel">
+      <h2>Expense details</h2>
+      <p class="panel-copy">Choose a jar and enter the expense details.</p>
+
+      @if (errorMessage()) {
+        <div role="alert" class="status error-status">{{ errorMessage() }}</div>
+      } @else if (!isPlanAvailable()) {
+        <div role="alert" class="status error-status">
+          No monthly plan exists for the selected date. Please create a monthly plan first.
+        </div>
+      } @else {
+        <div role="status" aria-live="polite" class="status">
+          Please complete the required expense details.
+        </div>
+      }
+
+      <!-- Expense Date Field -->
+      <label for="expense-date">Expense date <span>*</span></label>
+      <input
+        id="expense-date"
+        type="date"
+        [value]="expenseDate()"
+        (input)="onDateChange($event)"
+        (blur)="dateTouched.set(true)"
+        [attr.aria-invalid]="dateTouched() && !isDateValid()"
+      />
+      @if (dateTouched() && !isDateValid()) {
+        <small class="field-error">Please select a valid expense date.</small>
+      }
+
+      <!-- Jar Type Field -->
+      <label for="jar-type">Jar <span>*</span></label>
+      <div class="select-control">
+        <select
+          id="jar-type"
+          [value]="jarKey()"
+          (change)="onJarChange($event)"
+          (blur)="jarTouched.set(true)"
+          [attr.aria-invalid]="jarTouched() && !isJarValid()"
+        >
+          <option value="" disabled selected>Select a jar</option>
+          @for (jar of availableJars(); track jar.id) {
+            <option [value]="jar.key">
+              {{ jar.name }} · {{ jar.defaultRate }}%
+            </option>
+          }
+        </select>
+        <span aria-hidden="true" class="select-chevron"></span>
+      </div>
+      @if (jarTouched() && !isJarValid()) {
+        <small class="field-error">Please select a jar.</small>
+      }
+
+      <!-- Amount Field -->
+      <label for="amount">Amount <span>*</span></label>
+      <div class="amount-control">
+        <input
+          id="amount"
+          type="text"
+          inputmode="numeric"
+          autocomplete="off"
+          placeholder="1,250,000"
+          [value]="amount() !== null ? (amount() | number) : ''"
+          (input)="onAmountChange($event)"
+          (blur)="amountTouched.set(true)"
+          [attr.aria-invalid]="amountTouched() && !isAmountValid()"
+        />
+        <span>VND</span>
+      </div>
+      <small class="hint">Enter a positive whole-VND amount.</small>
+      @if (amountTouched() && !isAmountValid()) {
+        <small class="field-error">Amount must be greater than zero.</small>
+      }
+
+      <!-- Description Field -->
+      <label for="description">Description <span>*</span></label>
+      <input
+        id="description"
+        type="text"
+        maxlength="500"
+        placeholder="e.g. Weekly groceries"
+        [value]="description()"
+        (input)="onDescriptionChange($event)"
+        (blur)="descriptionTouched.set(true)"
+        [attr.aria-invalid]="descriptionTouched() && !isDescriptionValid()"
+      />
+      @if (descriptionTouched() && !isDescriptionValid()) {
+        <small class="field-error">Description is required.</small>
+      }
+
+      <!-- Submit Button -->
+      <button
+        type="submit"
+        class="save-button"
+        [disabled]="!isValid() || isSubmitting()"
+      >
+        <span aria-hidden="true">✓</span> Save expense
+      </button>
+    </form>
+
+    <!-- Right Column: Selected Jar Summary Panel -->
+    <aside aria-labelledby="selected-jar-title" class="summary-panel">
+      <h2 id="selected-jar-title">Selected jar</h2>
+      <p class="panel-copy">Assigned to this expense</p>
+
+      @if (!selectedJar()) {
+        <div class="jar-summary empty">
+          <strong>Select a jar</strong>
+          <span>Choose a jar to assign this expense.</span>
+        </div>
+      } @else {
+        <div class="jar-summary jar-active">
+          <strong>{{ selectedJar()?.name }}</strong>
+          <span class="jar-rate-badge">{{ selectedJar()?.defaultRate }}% of total income</span>
+          <div class="jar-figures">
+            <div>
+              <small>Allocated Budget:</small>
+              <b>{{ selectedJar()?.allocatedAmount | number }} VND</b>
+            </div>
+            <div>
+              <small>Spent so far:</small>
+              <b>{{ selectedJar()?.spentAmount | number }} VND</b>
+            </div>
+            <div>
+              <small>Remaining balance:</small>
+              <b [class.positive]="selectedJar()!.remainingAmount >= 0" [class.negative]="selectedJar()!.remainingAmount < 0">
+                {{ selectedJar()?.remainingAmount | number }} VND
+              </b>
+            </div>
+          </div>
+        </div>
+      }
+
+      <div class="refresh-note">
+        Jar spending totals refresh after the expense is saved.
+      </div>
+    </aside>
+  </div>
+</div>
+

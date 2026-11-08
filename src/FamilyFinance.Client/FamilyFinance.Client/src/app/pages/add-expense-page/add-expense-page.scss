@@ -1,0 +1,319 @@
+:host {
+  display: block;
+}
+
+.page-main {
+  flex: 1;
+  min-width: 0;
+  padding: 28px 40px 56px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--f1-slate, #5e7fa5);
+  font-size: 0.8125rem;
+  text-decoration: none;
+
+  &:hover {
+    color: var(--f1-navy, #1b4167);
+  }
+
+  span {
+    font-size: 1.4rem;
+    line-height: 0.5;
+  }
+}
+
+.page-intro {
+  margin: 22px 0 28px;
+
+  h1 {
+    margin: 0;
+    color: var(--f1-charcoal, #1d3858);
+    font-size: clamp(1.5rem, 2.5vw, 1.75rem);
+    line-height: 1.2;
+    font-weight: 700;
+  }
+
+  p {
+    margin: 7px 0 0;
+    color: var(--f1-slate, #5e7fa5);
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+}
+
+.expense-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 680px) minmax(280px, 420px);
+  gap: 28px;
+  align-items: start;
+}
+
+.details-panel,
+.summary-panel {
+  padding: 26px;
+  border: 1px solid var(--f1-grey, #d7e3f1);
+  border-radius: 8px;
+  background: var(--f1-surface, #ffffff);
+
+  h2 {
+    margin: 0;
+    color: var(--f1-charcoal, #1d3858);
+    font-size: 1.25rem;
+    line-height: 1.4;
+    font-weight: 700;
+  }
+
+  .panel-copy {
+    margin: 7px 0 20px;
+    color: var(--f1-slate, #5e7fa5);
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+}
+
+/* Form Styles */
+.details-panel {
+  display: flex;
+  flex-direction: column;
+
+  .status {
+    padding: 10px 14px;
+    border-radius: 6px;
+    background: var(--f1-bg, #f4f8fc);
+    color: var(--f1-slate, #5e7fa5);
+    font-size: 0.8125rem;
+    margin-bottom: 20px;
+
+    &.error-status {
+      background: #fff0f1;
+      color: var(--f1-red, #f04452);
+      font-weight: 600;
+    }
+  }
+
+  label {
+    margin-top: 14px;
+    margin-bottom: 6px;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--f1-navy, #1b4167);
+
+    span {
+      color: var(--f1-red, #f04452);
+    }
+  }
+
+  input[type='date'],
+  input[type='text'] {
+    width: 100%;
+    height: 42px;
+    padding: 0 12px;
+    border: 1px solid var(--f1-grey, #d7e3f1);
+    border-radius: 6px;
+    font-size: 0.875rem;
+    color: var(--f1-navy, #1b4167);
+    outline: none;
+
+    &:focus {
+      border-color: var(--f1-navy, #1b4167);
+    }
+
+    &[aria-invalid='true'] {
+      border-color: var(--f1-red, #f04452);
+    }
+  }
+
+  .select-control {
+    position: relative;
+    width: 100%;
+
+    select {
+      width: 100%;
+      height: 42px;
+      padding: 0 32px 0 12px;
+      border: 1px solid var(--f1-grey, #d7e3f1);
+      border-radius: 6px;
+      font-size: 0.875rem;
+      color: var(--f1-navy, #1b4167);
+      background: var(--f1-surface, #ffffff);
+      cursor: pointer;
+      appearance: none;
+      outline: none;
+
+      &:focus {
+        border-color: var(--f1-navy, #1b4167);
+      }
+
+      &[aria-invalid='true'] {
+        border-color: var(--f1-red, #f04452);
+      }
+    }
+
+    .select-chevron {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 0;
+      height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 5px solid var(--f1-slate, #5e7fa5);
+      pointer-events: none;
+    }
+  }
+
+  .amount-control {
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    input {
+      padding-right: 48px;
+    }
+
+    span {
+      position: absolute;
+      right: 14px;
+      font-size: 0.8125rem;
+      font-weight: 700;
+      color: var(--f1-slate, #5e7fa5);
+      pointer-events: none;
+    }
+  }
+
+  .hint {
+    margin-top: 4px;
+    font-size: 0.75rem;
+    color: var(--f1-slate, #5e7fa5);
+  }
+
+  .field-error {
+    margin-top: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--f1-red, #f04452);
+  }
+
+  .save-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 24px;
+    height: 44px;
+    padding: 0 24px;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--f1-surface, #ffffff);
+    background: var(--f1-red, #f04452);
+    cursor: pointer;
+    transition: opacity 0.15s;
+
+    &:hover:not(:disabled) {
+      opacity: 0.9;
+    }
+
+    &:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      background: var(--f1-slate, #5e7fa5);
+    }
+  }
+}
+
+/* Summary Panel */
+.summary-panel {
+  .jar-summary {
+    padding: 22px 18px;
+    border: 1px solid var(--f1-grey, #d7e3f1);
+    border-radius: 8px;
+    background: var(--f1-surface, #ffffff);
+
+    strong {
+      display: block;
+      color: var(--f1-charcoal, #1d3858);
+      font-size: 1.25rem;
+    }
+
+    span {
+      display: block;
+      margin-top: 6px;
+      font-size: 0.8125rem;
+    }
+
+    &.empty {
+      background: var(--f1-bg, #f4f8fc);
+
+      span {
+        color: var(--f1-slate, #5e7fa5);
+        line-height: 1.5;
+      }
+    }
+
+    &.jar-active {
+      border-left: 4px solid var(--f1-jar-investment, #0872c4);
+
+      .jar-rate-badge {
+        display: inline-block;
+        padding: 2px 8px;
+        margin-top: 4px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--f1-jar-investment, #0872c4);
+        background: var(--f1-lavender, #edf5fd);
+      }
+
+      .jar-figures {
+        margin-top: 16px;
+        display: grid;
+        gap: 8px;
+
+        div {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          font-size: 0.8125rem;
+
+          small {
+            color: var(--f1-slate, #5e7fa5);
+          }
+
+          b {
+            color: var(--f1-navy, #1b4167);
+
+            &.positive {
+              color: var(--f1-green, #0d927d);
+            }
+
+            &.negative {
+              color: var(--f1-red, #f04452);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .refresh-note {
+    margin-top: 16px;
+    font-size: 0.75rem;
+    color: var(--f1-slate, #5e7fa5);
+    line-height: 1.4;
+  }
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .expense-layout {
+    grid-template-columns: 1fr;
+  }
+}
+

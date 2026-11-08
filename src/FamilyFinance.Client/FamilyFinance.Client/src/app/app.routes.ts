@@ -24,10 +24,10 @@ export const routes: Routes = [
           ),
       },
       {
-        path: 'income-allocation',
+        path: 'expenses/new',
         loadComponent: () =>
-          import('./pages/income-allocation-page/income-allocation-page').then(
-            (m) => m.IncomeAllocationPage
+          import('./pages/add-expense-page/add-expense-page').then(
+            (m) => m.AddExpensePage
           ),
       },
     ],
