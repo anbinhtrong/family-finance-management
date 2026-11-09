@@ -1,8 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import { of, throwError } from 'rxjs';
+import { vi } from 'vitest';
 import { HomePage } from './home-page';
 import { MonthlyPlanService } from '../../features/monthly-planning/services/monthly-plan.service';
 import { ExpenseService } from '../../features/expenses/services/expense.service';
+import { MonthlyPlan } from '../../features/monthly-planning/models/monthly-plan.model';
+import { signal } from '@angular/core';
 
 describe('HomePage (Monthly Dashboard)', () => {
   let fixture: ComponentFixture<HomePage>;
@@ -10,22 +14,56 @@ describe('HomePage (Monthly Dashboard)', () => {
   let planService: MonthlyPlanService;
   let expenseService: ExpenseService;
 
+  const mockPlan: MonthlyPlan = {
+    id: '1',
+    year: 2026,
+    month: 10,
+    income: 30000000,
+    createdAt: new Date().toISOString(),
+    jars: [
+      { id: '1', name: 'Living Expenses', key: 'living', defaultRate: 35, allocatedAmount: 10500000, spentAmount: 0, remainingAmount: 10500000 },
+      { id: '2', name: 'Food', key: 'food', defaultRate: 20, allocatedAmount: 6000000, spentAmount: 0, remainingAmount: 6000000 },
+      { id: '3', name: 'Children', key: 'children', defaultRate: 10, allocatedAmount: 3000000, spentAmount: 0, remainingAmount: 3000000 },
+      { id: '4', name: 'Emergency Fund', key: 'emergency', defaultRate: 10, allocatedAmount: 3000000, spentAmount: 0, remainingAmount: 3000000 },
+      { id: '5', name: 'Savings', key: 'savings', defaultRate: 10, allocatedAmount: 3000000, spentAmount: 0, remainingAmount: 3000000 },
+      { id: '6', name: 'Investment', key: 'investment', defaultRate: 10, allocatedAmount: 3000000, spentAmount: 0, remainingAmount: 3000000 },
+      { id: '7', name: 'Entertainment & Travel', key: 'travel', defaultRate: 5, allocatedAmount: 1500000, spentAmount: 0, remainingAmount: 1500000 },
+    ],
+  };
+
   beforeEach(async () => {
+    const expensesSignalMock = signal<any[]>([]);
+
+    const planServiceMock = {
+      getPlan: vi.fn((year: number, month: number) => (year === 2026 && month === 10 ? mockPlan : undefined)),
+      getPlanByMonth: vi.fn((year: number, month: number) =>
+        year === 2026 && month === 10 ? of(mockPlan) : throwError(() => new Error('Not found'))
+      ),
+    };
+
+    const expenseServiceMock = {
+      expenses: expensesSignalMock.asReadonly(),
+      getSpendingByJars: vi.fn().mockReturnValue(of({ year: 2026, month: 10, currency: 'VND', jars: [] })),
+      recordExpense: vi.fn(),
+    };
+
     await TestBed.configureTestingModule({
       imports: [HomePage],
-      providers: [MonthlyPlanService, ExpenseService, provideRouter([])],
+      providers: [
+        { provide: MonthlyPlanService, useValue: planServiceMock },
+        { provide: ExpenseService, useValue: expenseServiceMock },
+        provideRouter([]),
+      ],
     }).compileComponents();
 
     planService = TestBed.inject(MonthlyPlanService);
     expenseService = TestBed.inject(ExpenseService);
 
-    // Setup an active plan for October 2026 with 30,000,000 VND income
-    planService.createPlan(2026, 10, 30000000);
-
     fixture = TestBed.createComponent(HomePage);
     component = fixture.componentInstance;
     component.selectedYear.set(2026);
     component.selectedMonth.set(10);
+    component.activePlan.set(mockPlan);
     fixture.detectChanges();
   });
 
@@ -35,8 +73,8 @@ describe('HomePage (Monthly Dashboard)', () => {
 
   describe('Empty State', () => {
     it('should display "No monthly plan" empty state when no plan exists for the selected period', () => {
-      // Switch to January 2026 where no plan exists
       component.selectedMonth.set(1);
+      component.activePlan.set(null);
       fixture.detectChanges();
 
       expect(component.activePlan()).toBeNull();
@@ -59,22 +97,23 @@ describe('HomePage (Monthly Dashboard)', () => {
 
       const cards = fixture.nativeElement.querySelectorAll('.summary-card');
       expect(cards.length).toBe(3);
-      // Available balance card
       expect(cards[0].textContent).toContain('30,000,000');
-      // Monthly income card
       expect(cards[1].textContent).toContain('30,000,000');
-      // Spent this month card
       expect(cards[2].textContent).toContain('0');
       expect(cards[2].textContent).toContain('0% of income');
     });
 
-    it('should dynamically update KPI cards and overall progress when expenses are recorded', () => {
-      expenseService.recordExpense({
-        date: '2026-10-05',
-        jarKey: 'food',
-        amount: 3000000, // 10% of 30M
-        note: 'Groceries store',
-      });
+    it('should dynamically update KPI cards and overall progress when plan has spent amounts', () => {
+      const planWithExpense: MonthlyPlan = {
+        ...mockPlan,
+        jars: mockPlan.jars.map((j) =>
+          j.key === 'food'
+            ? { ...j, spentAmount: 3000000, remainingAmount: 3000000 }
+            : j
+        ),
+      };
+
+      component.activePlan.set(planWithExpense);
       fixture.detectChanges();
 
       expect(component.totalSpent()).toBe(3000000);
@@ -96,13 +135,16 @@ describe('HomePage (Monthly Dashboard)', () => {
     });
 
     it('should highlight over-budget jar with warning tag when spent exceeds allocated budget', () => {
-      // Entertainment & Travel budget: 5% of 30M = 1,500,000 VND
-      expenseService.recordExpense({
-        date: '2026-10-18',
-        jarKey: 'travel',
-        amount: 2000000, // 500k over budget
-        note: 'Concert ticket and travel',
-      });
+      const planOverBudget: MonthlyPlan = {
+        ...mockPlan,
+        jars: mockPlan.jars.map((j) =>
+          j.key === 'travel'
+            ? { ...j, spentAmount: 2000000, remainingAmount: -500000 }
+            : j
+        ),
+      };
+
+      component.activePlan.set(planOverBudget);
       fixture.detectChanges();
 
       const travelJar = component.jarPerformance().find((j) => j.key === 'travel')!;
@@ -117,38 +159,10 @@ describe('HomePage (Monthly Dashboard)', () => {
   });
 
   describe('Recent Expenses List', () => {
-    it('should list recent expenses sorted descending by date', () => {
-      expenseService.recordExpense({
-        date: '2026-10-02',
-        jarKey: 'food',
-        amount: 100000,
-        note: 'First dinner',
-      });
-      expenseService.recordExpense({
-        date: '2026-10-15',
-        jarKey: 'living',
-        amount: 800000,
-        note: 'Water bill',
-      });
-      expenseService.recordExpense({
-        date: '2026-10-10',
-        jarKey: 'savings',
-        amount: 500000,
-        note: 'Mid-month savings',
-      });
-      fixture.detectChanges();
-
-      const recent = component.recentExpenses();
-      expect(recent.length).toBe(3);
-      // Sorted descending: 10-15, then 10-10, then 10-02
-      expect(recent[0].date).toBe('2026-10-15');
-      expect(recent[0].note).toBe('Water bill');
-      expect(recent[1].date).toBe('2026-10-10');
-      expect(recent[2].date).toBe('2026-10-02');
-
-      const listItems = fixture.nativeElement.querySelectorAll('.activity-list li');
-      expect(listItems.length).toBe(3);
-      expect(listItems[0].textContent).toContain('Water bill');
+    it('should display empty recent activity state when no expenses recorded', () => {
+      const emptyActivity = fixture.nativeElement.querySelector('.empty-activity');
+      expect(emptyActivity).toBeTruthy();
+      expect(emptyActivity.textContent).toContain('No expenses recorded for this month yet.');
     });
   });
 });

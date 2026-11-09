@@ -1,10 +1,10 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { MonthlyPlanService } from '../../features/monthly-planning/services/monthly-plan.service';
 import { ExpenseService } from '../../features/expenses/services/expense.service';
-import { AllocatedJarItem, PredefinedJarKey } from '../../features/monthly-planning/models/monthly-plan.model';
+import { AllocatedJarItem, MonthlyPlan, PredefinedJarKey } from '../../features/monthly-planning/models/monthly-plan.model';
 
 export interface JarPerformanceItem extends AllocatedJarItem {
   percentageUsed: number;
@@ -26,6 +26,48 @@ export class HomePage {
   selectedYear = signal<number>(2026);
   selectedMonth = signal<number>(10);
 
+  // Dynamic plan and status
+  activePlan = signal<MonthlyPlan | null>(null);
+  isLoading = signal<boolean>(false);
+
+  constructor() {
+    // Reactively load plan & spending metrics whenever year or month changes
+    effect(() => {
+      const year = this.selectedYear();
+      const month = this.selectedMonth();
+      this.loadDashboardData(year, month);
+    });
+  }
+
+  loadDashboardData(year: number, month: number): void {
+    this.isLoading.set(true);
+
+    this.planService.getPlanByMonth(year, month).subscribe({
+      next: (plan) => {
+        this.activePlan.set(plan);
+        this.isLoading.set(false);
+
+        // Fetch jar spending performance
+        this.expenseService.getSpendingByJars(plan.id).subscribe({
+          next: () => {
+            // Updated in service plansSignal
+            const refreshed = this.planService.getPlan(year, month);
+            if (refreshed) {
+              this.activePlan.set(refreshed);
+            }
+          },
+          error: () => {
+            // Keep plan allocations even if spending endpoint errors
+          },
+        });
+      },
+      error: () => {
+        this.activePlan.set(null);
+        this.isLoading.set(false);
+      },
+    });
+  }
+
   // Today label
   todayLabel = computed(() => {
     const options: Intl.DateTimeFormatOptions = {
@@ -35,11 +77,6 @@ export class HomePage {
       day: 'numeric',
     };
     return new Date().toLocaleDateString('en-US', options);
-  });
-
-  // Active plan for selected year & month
-  activePlan = computed(() => {
-    return this.planService.getPlan(this.selectedYear(), this.selectedMonth()) ?? null;
   });
 
   // Expenses for the selected plan

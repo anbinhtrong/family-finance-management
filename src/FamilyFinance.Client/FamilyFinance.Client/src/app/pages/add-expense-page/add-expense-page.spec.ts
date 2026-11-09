@@ -1,9 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
+import { of, throwError } from 'rxjs';
 import { vi } from 'vitest';
 import { AddExpensePage } from './add-expense-page';
 import { ExpenseService } from '../../features/expenses/services/expense.service';
 import { MonthlyPlanService } from '../../features/monthly-planning/services/monthly-plan.service';
+import { MonthlyPlan } from '../../features/monthly-planning/models/monthly-plan.model';
 
 describe('AddExpensePage', () => {
   let fixture: ComponentFixture<AddExpensePage>;
@@ -12,10 +14,52 @@ describe('AddExpensePage', () => {
   let planService: MonthlyPlanService;
   let router: Router;
 
+  const mockPlan: MonthlyPlan = {
+    id: '1',
+    year: 2026,
+    month: 10,
+    income: 30000000,
+    createdAt: new Date().toISOString(),
+    jars: [
+      { id: '1', name: 'Living Expenses', key: 'living', defaultRate: 35, allocatedAmount: 10500000, spentAmount: 0, remainingAmount: 10500000 },
+      { id: '2', name: 'Food', key: 'food', defaultRate: 20, allocatedAmount: 6000000, spentAmount: 0, remainingAmount: 6000000 },
+      { id: '3', name: 'Children', key: 'children', defaultRate: 10, allocatedAmount: 3000000, spentAmount: 0, remainingAmount: 3000000 },
+      { id: '4', name: 'Emergency Fund', key: 'emergency', defaultRate: 10, allocatedAmount: 3000000, spentAmount: 0, remainingAmount: 3000000 },
+      { id: '5', name: 'Savings', key: 'savings', defaultRate: 10, allocatedAmount: 3000000, spentAmount: 0, remainingAmount: 3000000 },
+      { id: '6', name: 'Investment', key: 'investment', defaultRate: 10, allocatedAmount: 3000000, spentAmount: 0, remainingAmount: 3000000 },
+      { id: '7', name: 'Entertainment & Travel', key: 'travel', defaultRate: 5, allocatedAmount: 1500000, spentAmount: 0, remainingAmount: 1500000 },
+    ],
+  };
+
   beforeEach(async () => {
+    const planServiceMock = {
+      getPlan: vi.fn((year: number, month: number) => (year === 2026 && month === 10 ? mockPlan : undefined)),
+      getPlanByMonth: vi.fn((year: number, month: number) =>
+        year === 2026 && month === 10 ? of(mockPlan) : throwError(() => new Error('Not found'))
+      ),
+    };
+
+    const expenseServiceMock = {
+      recordExpense: vi.fn().mockReturnValue(
+        of({
+          id: '1',
+          planId: '1',
+          jarKey: 'food',
+          amount: 150000,
+          date: '2026-10-15',
+          note: 'Supermarket groceries',
+          createdAt: new Date().toISOString(),
+        })
+      ),
+    };
+
     await TestBed.configureTestingModule({
       imports: [AddExpensePage],
-      providers: [ExpenseService, MonthlyPlanService, provideRouter([])],
+      providers: [
+        { provide: MonthlyPlanService, useValue: planServiceMock },
+        { provide: ExpenseService, useValue: expenseServiceMock },
+        provideRouter([]),
+      ],
     }).compileComponents();
 
     planService = TestBed.inject(MonthlyPlanService);
@@ -23,12 +67,10 @@ describe('AddExpensePage', () => {
     router = TestBed.inject(Router);
     vi.spyOn(router, 'navigate').mockResolvedValue(true);
 
-    // Seed test plan for 2026-10 with 30,000,000 VND
-    planService.createPlan(2026, 10, 30000000);
-
     fixture = TestBed.createComponent(AddExpensePage);
     component = fixture.componentInstance;
     component.expenseDate.set('2026-10-15');
+    component.selectedPlan.set(mockPlan);
     fixture.detectChanges();
   });
 
@@ -40,7 +82,6 @@ describe('AddExpensePage', () => {
     it('should list all 7 predefined jars from the active plan in the jar dropdown', () => {
       expect(component.availableJars().length).toBe(7);
       const options = fixture.nativeElement.querySelectorAll('#jar-type option');
-      // 1 placeholder + 7 jars = 8 options
       expect(options.length).toBe(8);
     });
 
@@ -60,7 +101,6 @@ describe('AddExpensePage', () => {
       expect(activeSummary).toBeTruthy();
       expect(activeSummary.textContent).toContain('Food');
       expect(activeSummary.textContent).toContain('20% of total income');
-      // Food allocated: 20% of 30M = 6,000,000 VND
       expect(activeSummary.textContent).toContain('6,000,000 VND');
     });
   });
@@ -78,8 +118,8 @@ describe('AddExpensePage', () => {
     });
 
     it('should show error when selecting a date outside any created plan month', () => {
-      // 2029-01 has no plan
       component.expenseDate.set('2029-01-10');
+      component.selectedPlan.set(null);
       fixture.detectChanges();
 
       expect(component.isPlanAvailable()).toBe(false);
@@ -92,6 +132,7 @@ describe('AddExpensePage', () => {
 
     it('should become valid when all required fields and valid date within plan are provided', () => {
       component.expenseDate.set('2026-10-15');
+      component.selectedPlan.set(mockPlan);
       component.jarKey.set('food');
       component.amount.set(150000);
       component.description.set('Supermarket groceries');
@@ -105,9 +146,8 @@ describe('AddExpensePage', () => {
 
   describe('Submission Flow', () => {
     it('should call expenseService.recordExpense and navigate to /dashboard on successful submit', () => {
-      const recordExpenseSpy = vi.spyOn(expenseService, 'recordExpense');
-
       component.expenseDate.set('2026-10-20');
+      component.selectedPlan.set(mockPlan);
       component.jarKey.set('living');
       component.amount.set(500000);
       component.description.set('Electricity bill');
@@ -116,7 +156,7 @@ describe('AddExpensePage', () => {
       const form: HTMLFormElement = fixture.nativeElement.querySelector('form');
       form.dispatchEvent(new Event('submit'));
 
-      expect(recordExpenseSpy).toHaveBeenCalledWith({
+      expect(expenseService.recordExpense).toHaveBeenCalledWith('1', {
         date: '2026-10-20',
         jarKey: 'living',
         amount: 500000,

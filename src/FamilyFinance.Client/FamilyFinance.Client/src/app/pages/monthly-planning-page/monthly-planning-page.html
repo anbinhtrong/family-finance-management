@@ -82,6 +82,10 @@
 
         <hr class="form-divider" />
 
+        @if (errorMessage()) {
+          <p class="field-error server-error" role="alert">{{ errorMessage() }}</p>
+        }
+
         <output aria-live="polite" class="status-message">
           Please select a month and enter a positive whole-VND income.
         </output>

@@ -2,6 +2,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
 import { MonthlyPlanService } from '../../features/monthly-planning/services/monthly-plan.service';
 
 @Component({
@@ -23,6 +24,7 @@ export class MonthlyPlanningPage {
   periodTouched = signal<boolean>(false);
   incomeTouched = signal<boolean>(false);
   isSubmitting = signal<boolean>(false);
+  errorMessage = signal<string | null>(null);
 
   // 7 Fixed predefined jars from service
   readonly defaultJars = this.planService.getDefaultJars();
@@ -46,6 +48,7 @@ export class MonthlyPlanningPage {
   onPeriodChange(event: Event): void {
     const val = (event.target as HTMLInputElement).value;
     this.period.set(val);
+    this.errorMessage.set(null);
   }
 
   onPeriodBlur(): void {
@@ -57,10 +60,12 @@ export class MonthlyPlanningPage {
     const cleaned = raw.replace(/,/g, '').trim();
     if (!cleaned) {
       this.monthlyIncome.set(null);
+      this.errorMessage.set(null);
       return;
     }
     const num = Number(cleaned);
     this.monthlyIncome.set(isNaN(num) ? null : num);
+    this.errorMessage.set(null);
   }
 
   onIncomeBlur(): void {
@@ -71,6 +76,7 @@ export class MonthlyPlanningPage {
     event.preventDefault();
     this.periodTouched.set(true);
     this.incomeTouched.set(true);
+    this.errorMessage.set(null);
 
     if (!this.isValid() || this.isSubmitting()) {
       return;
@@ -83,7 +89,21 @@ export class MonthlyPlanningPage {
 
     this.isSubmitting.set(true);
 
-    this.planService.createPlan(year, month, income);
-    this.router.navigate(['/dashboard']);
+    this.planService.createPlan(year, month, income).subscribe({
+      next: () => {
+        this.isSubmitting.set(false);
+        this.router.navigate(['/dashboard']);
+      },
+      error: (err: HttpErrorResponse) => {
+        this.isSubmitting.set(false);
+        if (err.error?.message) {
+          this.errorMessage.set(err.error.message);
+        } else if (err.status === 409) {
+          this.errorMessage.set('A monthly plan already exists for this month.');
+        } else {
+          this.errorMessage.set('Failed to create monthly plan. Please try again.');
+        }
+      },
+    });
   }
 }

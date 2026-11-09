@@ -1,8 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
+import { of, throwError } from 'rxjs';
 import { vi } from 'vitest';
 import { MonthlyPlanningPage } from './monthly-planning-page';
 import { MonthlyPlanService } from '../../features/monthly-planning/services/monthly-plan.service';
+import { MonthlyPlan } from '../../features/monthly-planning/models/monthly-plan.model';
 
 describe('MonthlyPlanningPage', () => {
   let fixture: ComponentFixture<MonthlyPlanningPage>;
@@ -10,10 +12,30 @@ describe('MonthlyPlanningPage', () => {
   let planService: MonthlyPlanService;
   let router: Router;
 
+  const mockPlan: MonthlyPlan = {
+    id: '1',
+    year: 2026,
+    month: 11,
+    income: 45000000,
+    createdAt: new Date().toISOString(),
+    jars: [],
+  };
+
   beforeEach(async () => {
+    const planServiceMock = {
+      getDefaultJars: vi.fn().mockReturnValue([
+        { id: '1', name: 'Living Expenses', key: 'living', defaultRate: 35 },
+        { id: '2', name: 'Food', key: 'food', defaultRate: 20 },
+      ]),
+      createPlan: vi.fn().mockReturnValue(of(mockPlan)),
+    };
+
     await TestBed.configureTestingModule({
       imports: [MonthlyPlanningPage],
-      providers: [MonthlyPlanService, provideRouter([])],
+      providers: [
+        { provide: MonthlyPlanService, useValue: planServiceMock },
+        provideRouter([]),
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(MonthlyPlanningPage);
@@ -80,8 +102,6 @@ describe('MonthlyPlanningPage', () => {
 
   describe('Submission Flow', () => {
     it('should call planService.createPlan with correct parameters and navigate to /dashboard on submit', () => {
-      const createPlanSpy = vi.spyOn(planService, 'createPlan');
-
       component.period.set('2026-11');
       component.monthlyIncome.set(45000000);
       fixture.detectChanges();
@@ -89,8 +109,27 @@ describe('MonthlyPlanningPage', () => {
       const form: HTMLFormElement = fixture.nativeElement.querySelector('form');
       form.dispatchEvent(new Event('submit'));
 
-      expect(createPlanSpy).toHaveBeenCalledWith(2026, 11, 45000000);
+      expect(planService.createPlan).toHaveBeenCalledWith(2026, 11, 45000000);
       expect(router.navigate).toHaveBeenCalledWith(['/dashboard']);
+    });
+
+    it('should display error message if plan creation fails', () => {
+      vi.spyOn(planService, 'createPlan').mockReturnValue(
+        throwError(() => ({ status: 409, error: { message: 'A monthly plan already exists for this month.' } }))
+      );
+
+      component.period.set('2026-11');
+      component.monthlyIncome.set(45000000);
+      fixture.detectChanges();
+
+      const form: HTMLFormElement = fixture.nativeElement.querySelector('form');
+      form.dispatchEvent(new Event('submit'));
+      fixture.detectChanges();
+
+      expect(component.errorMessage()).toBe('A monthly plan already exists for this month.');
+      const serverErrorEl = fixture.nativeElement.querySelector('.server-error');
+      expect(serverErrorEl).toBeTruthy();
+      expect(serverErrorEl.textContent).toContain('A monthly plan already exists for this month.');
     });
   });
 });

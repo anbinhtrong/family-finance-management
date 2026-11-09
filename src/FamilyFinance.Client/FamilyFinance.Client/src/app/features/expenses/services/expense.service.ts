@@ -1,70 +1,77 @@
 import { Injectable, inject, signal } from '@angular/core';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, tap, map, catchError, throwError } from 'rxjs';
+import { environment } from '../../../../environments/environment';
 import { CreateExpenseDto, Expense } from '../models/expense.model';
 import { MonthlyPlanService } from '../../monthly-planning/services/monthly-plan.service';
+import {
+  CreateExpenseRequest,
+  CreateExpenseResponse,
+  SpendingByJarsResponse,
+} from '../../../shared/models/api.model';
+import { toBackendJarType } from '../../monthly-planning/models/jar-mapper';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ExpenseService {
+  private readonly http = inject(HttpClient);
   private readonly planService = inject(MonthlyPlanService);
+  private readonly baseUrl = `${environment.apiUrl}/budget-plans`;
 
   private readonly expensesSignal = signal<Expense[]>([]);
   readonly expenses = this.expensesSignal.asReadonly();
 
   /**
-   * Records an expense, validates the plan, updates the target jar's spent amount and remaining balance.
+   * Records an expense on the backend API.
+   * Calls POST /api/budget-plans/{planId}/expenses.
    */
-  recordExpense(dto: CreateExpenseDto): { success: boolean; error?: string; expense?: Expense } {
-    // 1. Determine plan from date
-    const dateObj = new Date(dto.date);
-    if (isNaN(dateObj.getTime())) {
-      return { success: false, error: 'Invalid expense date.' };
-    }
-
-    const year = dateObj.getFullYear();
-    const month = dateObj.getMonth() + 1;
-    const plan = this.planService.getPlan(year, month);
-
-    if (!plan) {
-      return {
-        success: false,
-        error: `No monthly plan exists for ${year}-${String(month).padStart(2, '0')}. Please create a plan first.`,
-      };
-    }
-
-    // 2. Validate jar membership
-    const targetJar = plan.jars.find((j) => j.key === dto.jarKey);
-    if (!targetJar) {
-      return { success: false, error: 'The selected jar does not belong to this monthly plan.' };
-    }
-
-    // 3. Validate positive whole amount
-    if (!dto.amount || dto.amount <= 0 || !Number.isInteger(dto.amount)) {
-      return { success: false, error: 'Amount must be a positive whole-VND value.' };
-    }
-
-    // 4. Validate non-empty note/description
-    if (!dto.note || !dto.note.trim()) {
-      return { success: false, error: 'Description is required.' };
-    }
-
-    // 5. Create and persist expense
-    const newExpense: Expense = {
-      id: 'exp-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
-      planId: plan.id,
+  recordExpense(planId: string, dto: CreateExpenseDto): Observable<Expense> {
+    const payload: CreateExpenseRequest = {
       jarKey: dto.jarKey,
+      jarType: toBackendJarType(dto.jarKey),
       amount: dto.amount,
+      amountVnd: dto.amount.toString(),
       date: dto.date,
-      note: dto.note.trim(),
-      createdAt: new Date().toISOString(),
+      expenseDate: dto.date,
+      note: dto.note,
+      description: dto.note,
     };
 
-    this.expensesSignal.update((list) => [newExpense, ...list]);
+    return this.http
+      .post<CreateExpenseResponse>(`${this.baseUrl}/${planId}/expenses`, payload)
+      .pipe(
+        map((res) => {
+          const expense: Expense = {
+            id: String(res.expense.id),
+            planId,
+            jarKey: dto.jarKey,
+            amount: Number(res.expense.amountVnd) || dto.amount,
+            date: res.expense.expenseDate || dto.date,
+            note: res.expense.description || dto.note,
+            createdAt: res.expense.createdAtUtc || new Date().toISOString(),
+          };
+          return expense;
+        }),
+        tap((expense) => {
+          this.expensesSignal.update((list) => [expense, ...list]);
+          this.planService.applyExpense(expense);
+        }),
+        catchError((err: HttpErrorResponse) => throwError(() => err))
+      );
+  }
 
-    // 6. Update plan & jar balances
-    this.planService.applyExpense(newExpense);
-
-    return { success: true, expense: newExpense };
+  /**
+   * Fetches spending statistics for a plan via GET /api/budget-plans/{planId}/spending-by-jars.
+   */
+  getSpendingByJars(planId: string): Observable<SpendingByJarsResponse> {
+    return this.http
+      .get<SpendingByJarsResponse>(`${this.baseUrl}/${planId}/spending-by-jars`)
+      .pipe(
+        tap((stats) => {
+          this.planService.applySpendingStats(stats);
+        }),
+        catchError((err: HttpErrorResponse) => throwError(() => err))
+      );
   }
 }
-
