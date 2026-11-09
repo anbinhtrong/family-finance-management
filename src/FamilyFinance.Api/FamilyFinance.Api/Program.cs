@@ -32,7 +32,7 @@ builder.Services.AddControllers().ConfigureApiBehaviorOptions(options =>
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddCors(options => options.AddPolicy("frontend-development", policy =>
-    policy.WithOrigins("http://localhost:4400")
+    policy.WithOrigins("http://localhost:4400", "http://localhost:4200", "https://localhost:4400", "https://localhost:4200")
         .AllowAnyHeader()
         .AllowAnyMethod()));
 builder.Services.AddEndpointsApiExplorer();
@@ -44,6 +44,7 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     db.Database.Migrate();
+    db.Database.ExecuteSqlRaw("PRAGMA journal_mode=WAL;");
 }
 
 app.Use(async (context, next) =>
@@ -79,7 +80,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// In development, skip HTTPS redirection so local HTTP frontend calls aren't redirected to untrusted self-signed HTTPS
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 app.MapControllers();
 app.Run();
 

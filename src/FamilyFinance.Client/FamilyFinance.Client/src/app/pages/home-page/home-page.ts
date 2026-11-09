@@ -21,10 +21,11 @@ export interface JarPerformanceItem extends AllocatedJarItem {
 export class HomePage {
   private readonly planService = inject(MonthlyPlanService);
   private readonly expenseService = inject(ExpenseService);
+  private readonly now = new Date();
 
   // Month selector signals (defaulting to current active plan month & year, e.g. 10/2026)
-  selectedYear = signal<number>(2026);
-  selectedMonth = signal<number>(10);
+  selectedYear = signal<number>(this.now.getFullYear());
+  selectedMonth = signal<number>(this.now.getMonth() + 1);
 
   // Dynamic plan and status
   activePlan = signal<MonthlyPlan | null>(null);

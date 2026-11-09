@@ -5,4 +5,5 @@ public class CreateBudgetPlanRequest
     public int Year { get; set; }
     public int Month { get; set; }
     public string? MonthlyIncomeVnd { get; set; }
+    public long? MonthlyIncome { get; set; }
 }

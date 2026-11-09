@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 namespace FamilyFinance.Api.Controllers;
 
 [ApiController]
+[Route("api/budget-plans")]
 [Route("api/v1/budget-plans")]
 public class BudgetPlansController(ApplicationDbContext db) : ControllerBase
 {
@@ -58,6 +59,25 @@ public class BudgetPlansController(ApplicationDbContext db) : ControllerBase
         return Created($"/api/v1/budget-plans/{plan.Year}/{plan.Month}", Map(plan));
     }
 
+    [HttpGet]
+    public async Task<ActionResult<BudgetPlanResponse>> GetByQuery([FromQuery] int? year, [FromQuery] int? month)
+    {
+        if (year is null || month is null)
+        {
+            return BadRequest(new ApiErrorResponse
+            {
+                Code = "VALIDATION_ERROR",
+                Message = "Year and month query parameters are required.",
+                Errors =
+                [
+                    new ApiFieldError { Field = year is null ? "year" : "month", Code = "REQUIRED", Message = "Year and month query parameters are required." }
+                ]
+            });
+        }
+
+        return await GetByMonth(year.Value, month.Value);
+    }
+
     [HttpGet("{year:int}/{month:int}")]
     public async Task<ActionResult<BudgetPlanResponse>> GetByMonth(int year, int month)
     {
@@ -75,22 +95,39 @@ public class BudgetPlansController(ApplicationDbContext db) : ControllerBase
     }
 
     [HttpGet("{year:int}/{month:int}/spending-by-jars")]
-    public async Task<ActionResult<SpendingByJarsResponse>> GetSpendingByJars(int year, int month)
+    [HttpGet("{planId:int}/spending-by-jars")]
+    public async Task<ActionResult<SpendingByJarsResponse>> GetSpendingByJars(int year, int month, int planId = 0)
     {
-        var errors = ValidatePeriod(year, month);
-        if (errors.Count > 0)
+        BudgetPlan? plan;
+        if (planId > 0)
         {
-            return BadRequest(new ApiErrorResponse
+            plan = await db.BudgetPlans.AsNoTracking()
+                .Include(item => item.Allocations)
+                .SingleOrDefaultAsync(item => item.Id == planId);
+            if (plan is not null)
             {
-                Code = "VALIDATION_ERROR",
-                Message = "The requested month is invalid.",
-                Errors = errors
-            });
+                year = plan.Year;
+                month = plan.Month;
+            }
+        }
+        else
+        {
+            var errors = ValidatePeriod(year, month);
+            if (errors.Count > 0)
+            {
+                return BadRequest(new ApiErrorResponse
+                {
+                    Code = "VALIDATION_ERROR",
+                    Message = "The requested month is invalid.",
+                    Errors = errors
+                });
+            }
+
+            plan = await db.BudgetPlans.AsNoTracking()
+                .Include(item => item.Allocations)
+                .SingleOrDefaultAsync(item => item.Year == year && item.Month == month);
         }
 
-        var plan = await db.BudgetPlans.AsNoTracking()
-            .Include(item => item.Allocations)
-            .SingleOrDefaultAsync(item => item.Year == year && item.Month == month);
         if (plan is null)
         {
             return NotFound(new ApiErrorResponse
@@ -140,7 +177,8 @@ public class BudgetPlansController(ApplicationDbContext db) : ControllerBase
     }
 
     [HttpPost("expenses")]
-    public async Task<ActionResult<CreateExpenseResponse>> CreateExpense(CreateExpenseRequest request)
+    [HttpPost("{planId:int}/expenses")]
+    public async Task<ActionResult<CreateExpenseResponse>> CreateExpense(CreateExpenseRequest request, int planId = 0)
     {
         var requestErrors = ValidateExpenseRequest(request, out var expenseDate, out var amountVnd, out var jar);
         if (requestErrors.Count > 0)
@@ -148,9 +186,17 @@ public class BudgetPlansController(ApplicationDbContext db) : ControllerBase
             return BadRequest(ValidationResponse(requestErrors));
         }
 
-        var selectedDate = expenseDate!.Value;
-        var selectedJar = jar!;
-        var plan = await db.BudgetPlans.SingleOrDefaultAsync(item => item.Year == selectedDate.Year && item.Month == selectedDate.Month);
+        BudgetPlan? plan;
+        if (planId > 0)
+        {
+            plan = await db.BudgetPlans.SingleOrDefaultAsync(item => item.Id == planId);
+        }
+        else
+        {
+            var selectedDate = expenseDate!.Value;
+            plan = await db.BudgetPlans.SingleOrDefaultAsync(item => item.Year == selectedDate.Year && item.Month == selectedDate.Month);
+        }
+
         if (plan is null)
         {
             return NotFound(new ApiErrorResponse
@@ -160,6 +206,7 @@ public class BudgetPlansController(ApplicationDbContext db) : ControllerBase
             });
         }
 
+        var selectedJar = jar!;
         var allocation = await db.BudgetAllocations.SingleOrDefaultAsync(item =>
             item.BudgetPlanId == plan.Id && item.JarType == selectedJar.JarType);
         if (allocation is null)
@@ -172,14 +219,13 @@ public class BudgetPlansController(ApplicationDbContext db) : ControllerBase
             });
         }
 
-
         await using var transaction = await db.Database.BeginTransactionAsync();
         var expense = new Expense
         {
             BudgetAllocationId = allocation.Id,
-            ExpenseDate = selectedDate,
+            ExpenseDate = expenseDate ?? new DateOnly(plan.Year, plan.Month, 1),
             AmountVnd = amountVnd,
-            Description = request.Description!.Trim(),
+            Description = (request.Description ?? request.Note)!.Trim(),
             CreatedAtUtc = DateTime.UtcNow
         };
 
@@ -227,11 +273,12 @@ public class BudgetPlansController(ApplicationDbContext db) : ControllerBase
         jar = null;
         var errors = new List<ApiFieldError>();
 
-        if (string.IsNullOrEmpty(request.ExpenseDate))
+        var dateStr = request.ExpenseDate ?? request.Date;
+        if (string.IsNullOrEmpty(dateStr))
         {
             errors.Add(new ApiFieldError { Field = "expenseDate", Code = "REQUIRED", Message = "Expense date is required." });
         }
-        else if (!DateOnly.TryParseExact(request.ExpenseDate, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsedDate))
+        else if (!DateOnly.TryParseExact(dateStr, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsedDate))
         {
             errors.Add(new ApiFieldError { Field = "expenseDate", Code = "INVALID_FORMAT", Message = "Expense date must use YYYY-MM-DD format." });
         }
@@ -240,25 +287,33 @@ public class BudgetPlansController(ApplicationDbContext db) : ControllerBase
             expenseDate = parsedDate;
         }
 
-        if (string.IsNullOrEmpty(request.JarType))
+        var jarStr = request.JarType ?? request.JarKey;
+        if (string.IsNullOrEmpty(jarStr))
         {
             errors.Add(new ApiFieldError { Field = "jarType", Code = "REQUIRED", Message = "Jar type is required." });
         }
         else
         {
-            jar = DefaultJarCatalog.All.SingleOrDefault(item => item.ApiValue == request.JarType);
+            jar = DefaultJarCatalog.All.SingleOrDefault(item =>
+                item.ApiValue.Equals(jarStr, StringComparison.OrdinalIgnoreCase) ||
+                item.JarType.ToString().Equals(jarStr, StringComparison.OrdinalIgnoreCase) ||
+                (jarStr.Equals("travel", StringComparison.OrdinalIgnoreCase) && item.ApiValue == "entertainmentAndTravel") ||
+                (jarStr.Equals("living", StringComparison.OrdinalIgnoreCase) && item.ApiValue == "livingExpenses") ||
+                (jarStr.Equals("emergency", StringComparison.OrdinalIgnoreCase) && item.ApiValue == "emergencyFund"));
+
             if (jar is null)
             {
                 errors.Add(new ApiFieldError { Field = "jarType", Code = "INVALID_VALUE", Message = "Jar type is not valid." });
             }
         }
 
-        if (string.IsNullOrEmpty(request.AmountVnd))
+        var amtStr = request.AmountVnd ?? request.Amount?.ToString(CultureInfo.InvariantCulture);
+        if (string.IsNullOrEmpty(amtStr))
         {
             errors.Add(new ApiFieldError { Field = "amountVnd", Code = "REQUIRED", Message = "Expense amount is required." });
         }
-        else if (request.AmountVnd.Any(character => character is < '0' or > '9') ||
-                 !long.TryParse(request.AmountVnd, NumberStyles.None, CultureInfo.InvariantCulture, out amountVnd))
+        else if (amtStr.Any(character => character is < '0' or > '9') ||
+                 !long.TryParse(amtStr, NumberStyles.None, CultureInfo.InvariantCulture, out amountVnd))
         {
             errors.Add(new ApiFieldError { Field = "amountVnd", Code = "INVALID_FORMAT", Message = "Expense amount must contain ASCII digits and fit in a signed 64-bit integer." });
         }
@@ -267,7 +322,7 @@ public class BudgetPlansController(ApplicationDbContext db) : ControllerBase
             errors.Add(new ApiFieldError { Field = "amountVnd", Code = "MUST_BE_POSITIVE", Message = "Expense amount must be greater than zero." });
         }
 
-        var description = request.Description?.Trim();
+        var description = (request.Description ?? request.Note)?.Trim();
         if (string.IsNullOrEmpty(description))
         {
             errors.Add(new ApiFieldError { Field = "description", Code = "REQUIRED", Message = "Description is required." });
@@ -307,12 +362,13 @@ public class BudgetPlansController(ApplicationDbContext db) : ControllerBase
     {
         incomeVnd = 0;
         var errors = ValidatePeriod(request.Year, request.Month);
-        if (string.IsNullOrEmpty(request.MonthlyIncomeVnd))
+        var incomeStr = request.MonthlyIncomeVnd ?? request.MonthlyIncome?.ToString(CultureInfo.InvariantCulture);
+        if (string.IsNullOrEmpty(incomeStr))
         {
             errors.Add(new ApiFieldError { Field = "monthlyIncomeVnd", Code = "REQUIRED", Message = "Monthly income is required." });
         }
-        else if (request.MonthlyIncomeVnd.Any(character => character is < '0' or > '9') ||
-                 !long.TryParse(request.MonthlyIncomeVnd, NumberStyles.None, CultureInfo.InvariantCulture, out incomeVnd))
+        else if (incomeStr.Any(character => character is < '0' or > '9') ||
+                 !long.TryParse(incomeStr, NumberStyles.None, CultureInfo.InvariantCulture, out incomeVnd))
         {
             errors.Add(new ApiFieldError { Field = "monthlyIncomeVnd", Code = "INVALID_FORMAT", Message = "Monthly income must contain ASCII digits and fit in a signed 64-bit integer." });
         }
