@@ -6,6 +6,8 @@ import { MonthlyPlanService } from '../../features/monthly-planning/services/mon
 import { ExpenseService } from '../../features/expenses/services/expense.service';
 import { AllocatedJarItem, MonthlyPlan, PredefinedJarKey } from '../../features/monthly-planning/models/monthly-plan.model';
 
+import { MonthYearPickerComponent } from '../../shared/components/month-year-picker/month-year-picker';
+
 export interface JarPerformanceItem extends AllocatedJarItem {
   percentageUsed: number;
   isOverBudget: boolean;
@@ -14,7 +16,7 @@ export interface JarPerformanceItem extends AllocatedJarItem {
 @Component({
   selector: 'app-home-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, MonthYearPickerComponent],
   templateUrl: './home-page.html',
   styleUrl: './home-page.scss',
 })
@@ -23,9 +25,16 @@ export class HomePage {
   private readonly expenseService = inject(ExpenseService);
   private readonly now = new Date();
 
-  // Month selector signals (defaulting to current active plan month & year, e.g. 10/2026)
+  // Month selector signals (defaulting to current active plan month & year)
   selectedYear = signal<number>(this.now.getFullYear());
   selectedMonth = signal<number>(this.now.getMonth() + 1);
+
+  // Formatted period "YYYY-MM" for <input type="month">
+  period = computed(() => {
+    const y = this.selectedYear();
+    const m = String(this.selectedMonth()).padStart(2, '0');
+    return `${y}-${m}`;
+  });
 
   // Dynamic plan and status
   activePlan = signal<MonthlyPlan | null>(null);
@@ -133,6 +142,23 @@ export class HomePage {
     const date = new Date(this.selectedYear(), this.selectedMonth() - 1, 1);
     return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
   });
+
+  onPeriodPicked(event: { year: number; month: number }): void {
+    this.selectedYear.set(event.year);
+    this.selectedMonth.set(event.month);
+  }
+
+  onPeriodChange(event: Event): void {
+    const val = (event.target as HTMLInputElement).value;
+    if (!val) return;
+    const [yStr, mStr] = val.split('-');
+    const year = Number(yStr);
+    const month = Number(mStr);
+    if (!isNaN(year) && !isNaN(month)) {
+      this.selectedYear.set(year);
+      this.selectedMonth.set(month);
+    }
+  }
 
   onMonthChange(event: Event): void {
     const val = Number((event.target as HTMLSelectElement).value);

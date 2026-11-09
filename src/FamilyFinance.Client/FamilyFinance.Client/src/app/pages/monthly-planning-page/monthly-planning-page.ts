@@ -1,23 +1,28 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MonthlyPlanService } from '../../features/monthly-planning/services/monthly-plan.service';
+
+import { MonthYearPickerComponent } from '../../shared/components/month-year-picker/month-year-picker';
 
 @Component({
   selector: 'app-monthly-planning-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, MonthYearPickerComponent],
   templateUrl: './monthly-planning-page.html',
   styleUrl: './monthly-planning-page.scss',
 })
-export class MonthlyPlanningPage {
+export class MonthlyPlanningPage implements OnInit {
   private readonly planService = inject(MonthlyPlanService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   // Form Signals
-  period = signal<string>(''); // YYYY-MM from <input type="month">
+  period = signal<string>(''); // YYYY-MM
+  selectedYear = signal<number>(new Date().getFullYear());
+  selectedMonth = signal<number>(new Date().getMonth() + 1);
   monthlyIncome = signal<number | null>(null);
 
   // Interaction State Signals
@@ -28,6 +33,32 @@ export class MonthlyPlanningPage {
 
   // 7 Fixed predefined jars from service
   readonly defaultJars = this.planService.getDefaultJars();
+
+  ngOnInit(): void {
+    // Read optional period query parameter, e.g. /monthly-planning?period=2026-10
+    const queryPeriod = this.route.snapshot.queryParamMap.get('period');
+    if (queryPeriod) {
+      const parts = queryPeriod.split('-');
+      if (parts.length === 2) {
+        const year = Number(parts[0]);
+        const month = Number(parts[1]);
+        if (!isNaN(year) && !isNaN(month) && month >= 1 && month <= 12) {
+          this.selectedYear.set(year);
+          this.selectedMonth.set(month);
+          this.period.set(queryPeriod);
+          return;
+        }
+      }
+    }
+
+    // Default to current year and month if not provided
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth() + 1;
+    this.selectedYear.set(currentYear);
+    this.selectedMonth.set(currentMonth);
+    this.period.set(`${currentYear}-${String(currentMonth).padStart(2, '0')}`);
+  }
 
   // Validations
   isPeriodValid = computed(() => {
@@ -45,6 +76,15 @@ export class MonthlyPlanningPage {
   isValid = computed(() => this.isPeriodValid() && this.isIncomeValid());
 
   // Input event handlers
+  onPeriodPicked(event: { year: number; month: number }): void {
+    this.selectedYear.set(event.year);
+    this.selectedMonth.set(event.month);
+    const mStr = String(event.month).padStart(2, '0');
+    this.period.set(`${event.year}-${mStr}`);
+    this.periodTouched.set(true);
+    this.errorMessage.set(null);
+  }
+
   onPeriodChange(event: Event): void {
     const val = (event.target as HTMLInputElement).value;
     this.period.set(val);

@@ -1,15 +1,21 @@
 <div class="page-main">
-  <nav aria-label="Breadcrumb" class="breadcrumbs">
-    <a routerLink="/dashboard" aria-label="Home">
-      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-6v-7h-4v7H4a1 1 0 0 1-1-1V10Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path>
-      </svg>
+  <div class="top-nav-bar">
+    <a routerLink="/dashboard" class="back-link">
+      <span aria-hidden="true">‹</span> Back to dashboard
     </a>
-    <span aria-hidden="true" class="breadcrumb-separator">/</span>
-    <a routerLink="/monthly-planning">Monthly planning</a>
-    <span aria-hidden="true" class="breadcrumb-separator">/</span>
-    <span aria-current="page">Create monthly plan</span>
-  </nav>
+
+    <nav aria-label="Breadcrumb" class="breadcrumbs">
+      <a routerLink="/dashboard" aria-label="Home">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-6v-7h-4v7H4a1 1 0 0 1-1-1V10Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path>
+        </svg>
+      </a>
+      <span aria-hidden="true" class="breadcrumb-separator">/</span>
+      <a routerLink="/dashboard">Monthly planning</a>
+      <span aria-hidden="true" class="breadcrumb-separator">/</span>
+      <span aria-current="page">Create monthly plan</span>
+    </nav>
+  </div>
 
   <section aria-labelledby="page-title" class="intro">
     <div aria-hidden="true" class="intro-icon">
@@ -30,24 +36,14 @@
       <h2 id="details-title">Plan details</h2>
       <form (submit)="onSubmit($event)" novalidate>
         <div class="field">
-          <label for="period"> Month <span class="required">*</span></label>
-          <div class="control">
-            <span aria-hidden="true" class="control-icon">
-              <svg viewBox="0 0 24 24" fill="none">
-                <rect x="3.5" y="5" width="17" height="15.5" rx="2" stroke="currentColor" stroke-width="1.8"></rect>
-                <path d="M7.5 3v4M16.5 3v4M4 9.5h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
-              </svg>
-            </span>
-            <input
-              id="period"
-              type="month"
-              [value]="period()"
-              (input)="onPeriodChange($event)"
-              (blur)="onPeriodBlur()"
-              [attr.aria-invalid]="periodTouched() && !isPeriodValid()"
-              aria-describedby="period-error"
-            />
-          </div>
+          <label> Month <span class="required">*</span></label>
+          <app-month-year-picker
+            [year]="selectedYear()"
+            [month]="selectedMonth()"
+            variant="input"
+            (changed)="onPeriodPicked($event)"
+            ariaLabel="Select plan month and year"
+          />
           @if (periodTouched() && !isPeriodValid()) {
             <p id="period-error" class="field-error">Select a month for this plan.</p>
           }
@@ -90,12 +86,18 @@
           Please select a month and enter a positive whole-VND income.
         </output>
 
-        <button
-          type="submit"
-          class="primary-button"
-          [disabled]="!isValid() || isSubmitting()">
-          Create monthly plan
-        </button>
+        <div class="form-actions">
+          <button
+            type="submit"
+            class="primary-button"
+            [disabled]="!isValid() || isSubmitting()">
+            Create monthly plan
+          </button>
+
+          <a routerLink="/dashboard" class="cancel-button">
+            Cancel
+          </a>
+        </div>
 
         <p class="one-plan-note">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">

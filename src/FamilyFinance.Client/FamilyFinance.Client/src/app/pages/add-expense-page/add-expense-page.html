@@ -32,6 +32,7 @@
         id="expense-date"
         type="date"
         [value]="expenseDate()"
+        (click)="$any($event.target).showPicker?.()"
         (input)="onDateChange($event)"
         (blur)="dateTouched.set(true)"
         [attr.aria-invalid]="dateTouched() && !isDateValid()"

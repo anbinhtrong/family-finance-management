@@ -6,29 +6,23 @@
       <h1 id="dashboard-title">Good morning, Family Name</h1>
       <p class="welcome-copy">Here is your family finance snapshot for this month.</p>
 
-      <label for="dashboard-month" class="dashboard-month-label">
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <rect x="3.5" y="5" width="17" height="15.5" rx="2" stroke="currentColor" stroke-width="1.8"></rect>
-          <path d="M7.5 3v4M16.5 3v4M4 9.5h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
-        </svg>
-        <select id="dashboard-month" [value]="selectedMonth()" (change)="onMonthChange($event)">
-          <option [value]="1">January 2026</option>
-          <option [value]="2">February 2026</option>
-          <option [value]="3">March 2026</option>
-          <option [value]="4">April 2026</option>
-          <option [value]="5">May 2026</option>
-          <option [value]="6">June 2026</option>
-          <option [value]="7">July 2026</option>
-          <option [value]="8">August 2026</option>
-          <option [value]="9">September 2026</option>
-          <option [value]="10">October 2026</option>
-          <option [value]="11">November 2026</option>
-          <option [value]="12">December 2026</option>
-        </select>
-      </label>
+      <div class="dashboard-month-picker-wrap">
+        <app-month-year-picker
+          [year]="selectedYear()"
+          [month]="selectedMonth()"
+          (changed)="onPeriodPicked($event)"
+          ariaLabel="Choose finance snapshot period"
+        />
+      </div>
     </div>
 
-    <a routerLink="/monthly-planning" class="primary-link">Plan this month</a>
+    <a
+      routerLink="/monthly-planning"
+      [queryParams]="{ period: period() }"
+      class="primary-link"
+    >
+      Plan this month
+    </a>
   </section>
 
   @if (!activePlan()) {
@@ -37,7 +31,13 @@
       <div class="empty-icon">📊</div>
       <h2>No monthly plan for {{ periodLabel() }}</h2>
       <p>There is no budget plan created for this period yet. Create a plan to track your jars and spending.</p>
-      <a routerLink="/monthly-planning" class="primary-link">Create plan now</a>
+      <a
+        routerLink="/monthly-planning"
+        [queryParams]="{ period: period() }"
+        class="primary-link"
+      >
+        Create plan now
+      </a>
     </div>
   } @else {
     <!-- 3 Summary Overview KPI Cards -->

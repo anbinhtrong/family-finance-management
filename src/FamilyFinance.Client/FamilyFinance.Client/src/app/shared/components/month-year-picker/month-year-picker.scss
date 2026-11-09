@@ -1,0 +1,231 @@
+:host {
+  display: inline-block;
+  position: relative;
+}
+
+.picker-container {
+  position: relative;
+  display: inline-flex;
+}
+
+/* Base trigger styling */
+.picker-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 6px 10px;
+  color: var(--f1-navy, #1b4167);
+  font-family: inherit;
+  font-size: var(--f1-small, 0.875rem);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+
+  &:hover {
+    background: rgba(94, 127, 165, 0.08);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--f1-navy, #1b4167);
+    outline-offset: 2px;
+  }
+
+  .calendar-icon {
+    display: inline-flex;
+    align-items: center;
+    color: var(--f1-slate, #5e7fa5);
+
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  .picker-label {
+    letter-spacing: -0.01em;
+  }
+
+  .chevron-icon {
+    display: inline-flex;
+    align-items: center;
+    color: var(--f1-slate, #5e7fa5);
+    transition: transform 0.2s ease;
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    &.rotated {
+      transform: rotate(180deg);
+    }
+  }
+}
+
+/* Variant: Form Input field styling */
+.variant-input {
+  width: 100%;
+
+  .picker-trigger {
+    width: 100%;
+    height: 44px;
+    padding: 0 14px;
+    background: var(--f1-surface, #ffffff);
+    border: 1px solid var(--f1-grey, #d7e3f1);
+    border-radius: 6px;
+    justify-content: flex-start;
+    font-weight: 600;
+
+    &:hover {
+      border-color: var(--f1-slate, #5e7fa5);
+      background: #fafcff;
+    }
+
+    .picker-label {
+      flex: 1;
+      text-align: left;
+      margin-left: 4px;
+      color: var(--f1-navy, #1b4167);
+    }
+
+    .chevron-icon {
+      margin-left: auto;
+    }
+  }
+}
+
+/* Popover Panel */
+.picker-popover {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 1000;
+  width: 250px;
+  background: var(--f1-surface, #ffffff);
+  border: 1px solid var(--f1-grey, #d7e3f1);
+  border-radius: 12px;
+  box-shadow: 0 10px 25px -5px rgba(27, 65, 103, 0.15), 0 8px 10px -6px rgba(27, 65, 103, 0.1);
+  padding: 14px;
+  animation: popoverFadeIn 0.15s ease-out;
+}
+
+@keyframes popoverFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Year Header */
+.popover-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #edf2f7;
+
+  .nav-year {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--f1-navy, #1b4167);
+  }
+
+  .nav-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--f1-navy, #1b4167);
+    font-size: 1.25rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s ease;
+
+    &:hover {
+      background: rgba(94, 127, 165, 0.12);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--f1-navy, #1b4167);
+    }
+  }
+}
+
+/* 3x4 Month Grid */
+.months-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+
+  .month-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 36px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--f1-navy, #1b4167);
+    font-family: inherit;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+
+    &:hover {
+      background: rgba(94, 127, 165, 0.1);
+      border-color: var(--f1-grey, #d7e3f1);
+    }
+
+    &.active {
+      background: var(--f1-navy, #1b4167);
+      color: #ffffff;
+      font-weight: 700;
+      box-shadow: 0 2px 6px rgba(27, 65, 103, 0.25);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--f1-navy, #1b4167);
+      outline-offset: 1px;
+    }
+  }
+}
+
+/* Popover Footer */
+.popover-footer {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid #edf2f7;
+  display: flex;
+  justify-content: center;
+
+  .this-month-btn {
+    border: none;
+    background: transparent;
+    color: var(--f1-red, #f04452);
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background 0.15s ease;
+
+    &:hover {
+      background: rgba(240, 68, 82, 0.08);
+    }
+  }
+}
+

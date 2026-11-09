@@ -38,28 +38,9 @@
     font-size: var(--f1-body, 1rem);
   }
 
-  .dashboard-month-label {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
+  .dashboard-month-picker-wrap {
     margin-top: 14px;
-    color: var(--f1-slate, #5e7fa5);
-    font-size: var(--f1-small, 0.875rem);
-
-    svg {
-      width: 18px;
-      height: 18px;
-    }
-
-    select {
-      padding: 4px 24px 4px 0;
-      color: var(--f1-navy, #1b4167);
-      background: transparent;
-      border: 0;
-      font-weight: 700;
-      cursor: pointer;
-      outline: none;
-    }
+    display: inline-block;
   }
 
   .primary-link {
