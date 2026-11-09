@@ -1,6 +1,6 @@
-# FamilyFinanceClient
+# FamilyFinance.Client
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.2.5.
+This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.2.5 (Angular 22).
 
 ## Development server
 
@@ -10,7 +10,15 @@ To start a local development server, run:
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+or via npm:
+
+```bash
+npm start
+```
+
+Once the server is running, open your browser and navigate to `http://localhost:4400/`. The application will automatically reload whenever you modify any of the source files.
+
+> **Note**: The dev server is configured to run on port **`4400`** in `angular.json` to align with the backend CORS configuration.
 
 ## Code scaffolding
 
